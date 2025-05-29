@@ -30,8 +30,15 @@ class ThemeService {
     // Check system preference
     this.systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Apply the initial theme
-    this.applyTheme();
+    // Check if theme was already applied by app.html script
+    const currentDataTheme = document.documentElement.getAttribute('data-theme');
+    if (currentDataTheme && ['light', 'dark', 'twilight'].includes(currentDataTheme)) {
+      // Theme already applied by app.html script, ensure consistency
+      console.log('Theme already applied by app.html script:', currentDataTheme);
+    } else {
+      // Apply the initial theme if not already set
+      this.applyTheme();
+    }
   }
 
   /**
