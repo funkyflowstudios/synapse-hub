@@ -3,7 +3,7 @@
  * Implements the "Quiet Intelligence" theming engine
  */
 
-export type ThemeOption = 'light' | 'dark' | 'auto';
+export type ThemeOption = 'light' | 'dark' | 'twilight' | 'auto';
 
 class ThemeService {
   private currentTheme: ThemeOption = 'auto';
@@ -23,7 +23,7 @@ class ThemeService {
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('synapse-theme') as ThemeOption | null;
-    if (savedTheme && ['light', 'dark', 'auto'].includes(savedTheme)) {
+    if (savedTheme && ['light', 'dark', 'twilight', 'auto'].includes(savedTheme)) {
       this.currentTheme = savedTheme;
     }
 
@@ -66,6 +66,8 @@ class ThemeService {
       document.documentElement.setAttribute('data-theme', 'light');
     } else if (this.currentTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (this.currentTheme === 'twilight') {
+      document.documentElement.setAttribute('data-theme', 'twilight');
     }
     // For 'auto', we rely on CSS media queries and don't set data-theme
   }
@@ -73,7 +75,7 @@ class ThemeService {
   /**
    * Get the effective theme (resolves 'auto' to 'light' or 'dark')
    */
-  getEffectiveTheme(): 'light' | 'dark' {
+  getEffectiveTheme(): 'light' | 'dark' | 'twilight' {
     if (this.currentTheme === 'auto') {
       return this.systemPrefersDark ? 'dark' : 'light';
     }
@@ -106,18 +108,25 @@ class ThemeService {
   }
 
   /**
-   * Toggle between light and dark (skips auto)
+   * Toggle between light, dark, and twilight (skips auto)
    */
   toggleTheme() {
     const effective = this.getEffectiveTheme();
-    this.setTheme(effective === 'dark' ? 'light' : 'dark');
+    if (effective === 'light') {
+      this.setTheme('dark');
+    } else if (effective === 'dark') {
+      this.setTheme('twilight');
+    } else {
+      this.setTheme('light');
+    }
   }
 
   /**
-   * Check if current effective theme is dark
+   * Check if current effective theme is dark (includes twilight)
    */
   isDark(): boolean {
-    return this.getEffectiveTheme() === 'dark';
+    const effective = this.getEffectiveTheme();
+    return effective === 'dark' || effective === 'twilight';
   }
 
   /**
@@ -143,6 +152,96 @@ class ThemeService {
     this.callbacks.forEach(callback => {
       callback(this.currentTheme, isDark);
     });
+  }
+
+  /* ==========================================================================
+     Dynamic Theme Adjustment Placeholders
+     Future: AI-driven personalization based on usage patterns
+     ========================================================================== */
+
+  /**
+   * Set ambient light level for dynamic brightness adjustment
+   * Placeholder for future ambient light sensor integration
+   */
+  setAmbientLight(level: 'low' | 'medium' | 'high') {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing ambient light attributes
+    document.documentElement.removeAttribute('data-ambient-light');
+    
+    if (level !== 'medium') {
+      document.documentElement.setAttribute('data-ambient-light', level);
+    }
+  }
+
+  /**
+   * Set contrast preference based on user behavior
+   * Placeholder for future AI learning of user preferences
+   */
+  setContrastPreference(preference: 'low' | 'normal' | 'high') {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing contrast preference attributes
+    document.documentElement.removeAttribute('data-contrast-preference');
+    
+    if (preference !== 'normal') {
+      document.documentElement.setAttribute('data-contrast-preference', preference);
+    }
+  }
+
+  /**
+   * Set reading mode for typography optimization
+   * Placeholder for future reading pattern analysis
+   */
+  setReadingMode(mode: 'compact' | 'normal' | 'comfortable') {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing reading mode attributes
+    document.documentElement.removeAttribute('data-reading-mode');
+    
+    if (mode !== 'normal') {
+      document.documentElement.setAttribute('data-reading-mode', mode);
+    }
+  }
+
+  /**
+   * Set focus mode for productivity optimization
+   * Placeholder for future deep work pattern detection
+   */
+  setFocusMode(mode: 'normal' | 'deep') {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing focus mode attributes
+    document.documentElement.removeAttribute('data-focus-mode');
+    
+    if (mode !== 'normal') {
+      document.documentElement.setAttribute('data-focus-mode', mode);
+    }
+  }
+
+  /**
+   * Auto-adjust theme based on time of day
+   * Placeholder for future circadian rhythm optimization
+   */
+  autoAdjustForTimeOfDay() {
+    const hour = new Date().getHours();
+    
+    // Simple heuristic - can be enhanced with AI learning
+    if (hour >= 18 || hour <= 6) {
+      // Evening/night: prefer twilight or dark
+      if (this.currentTheme === 'auto') {
+        // Could automatically switch to twilight mode
+        // For now, just apply ambient light adjustment
+        this.setAmbientLight('low');
+      }
+    } else if (hour >= 7 && hour <= 11) {
+      // Morning: bright and energetic
+      this.setAmbientLight('high');
+      this.setReadingMode('normal');
+    } else {
+      // Afternoon: balanced
+      this.setAmbientLight('medium');
+    }
   }
 }
 
@@ -179,6 +278,13 @@ export function createThemeStore() {
     setTheme: (theme: ThemeOption) => themeService.setTheme(theme),
     toggleTheme: () => themeService.toggleTheme(),
     get theme() { return currentTheme; },
-    get isDark() { return isDark; }
+    get isDark() { return isDark; },
+    
+    // Dynamic adjustment methods
+    setAmbientLight: (level: 'low' | 'medium' | 'high') => themeService.setAmbientLight(level),
+    setContrastPreference: (pref: 'low' | 'normal' | 'high') => themeService.setContrastPreference(pref),
+    setReadingMode: (mode: 'compact' | 'normal' | 'comfortable') => themeService.setReadingMode(mode),
+    setFocusMode: (mode: 'normal' | 'deep') => themeService.setFocusMode(mode),
+    autoAdjustForTimeOfDay: () => themeService.autoAdjustForTimeOfDay()
   };
 } 

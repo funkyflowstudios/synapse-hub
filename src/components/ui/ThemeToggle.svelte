@@ -8,13 +8,15 @@
   $: ({ theme, isDark } = $themeStore);
   
   /**
-   * Handle theme toggle - cycles through auto, light, dark
+   * Handle theme toggle - cycles through auto, light, dark, twilight
    */
   function handleToggle() {
     if (theme === 'auto') {
       themeStore.setTheme('light');
     } else if (theme === 'light') {
       themeStore.setTheme('dark');
+    } else if (theme === 'dark') {
+      themeStore.setTheme('twilight');
     } else {
       themeStore.setTheme('auto');
     }
@@ -24,19 +26,22 @@
    * Get display label for current theme
    */
   $: themeLabel = theme === 'auto' ? (isDark ? 'Auto (Dark)' : 'Auto (Light)') : 
-                  theme === 'light' ? 'Light' : 'Dark';
+                  theme === 'light' ? 'Light' : 
+                  theme === 'dark' ? 'Dark' : 'Twilight';
   
   /**
    * Get icon for current theme state
    */
-  $: themeIcon = theme === 'auto' ? 'auto' : theme === 'light' ? 'sun' : 'moon';
+  $: themeIcon = theme === 'auto' ? 'auto' : 
+                 theme === 'light' ? 'sun' : 
+                 theme === 'dark' ? 'moon' : 'twilight';
 </script>
 
 <button
   class="theme-toggle"
   on:click={handleToggle}
   title="Switch theme: {themeLabel}"
-  aria-label="Switch theme to {theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : 'auto'} mode"
+  aria-label="Switch theme to {theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : theme === 'dark' ? 'twilight' : 'auto'} mode"
 >
   <div class="theme-toggle__icon" class:theme-toggle__icon--dark={isDark}>
     {#if themeIcon === 'sun'}
@@ -56,6 +61,15 @@
       <!-- Moon icon for dark theme -->
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    {:else if themeIcon === 'twilight'}
+      <!-- Twilight icon - blend of sun and moon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5" opacity="0.5"/>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" opacity="0.7"/>
+        <line x1="12" y1="1" x2="12" y2="3" opacity="0.6"/>
+        <line x1="21" y1="12" x2="23" y2="12" opacity="0.6"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" opacity="0.6"/>
       </svg>
     {:else}
       <!-- Auto icon for system theme -->
@@ -132,6 +146,11 @@
   
   .theme-toggle__icon--dark {
     color: var(--color-interactive-secondary);
+  }
+  
+  /* Special styling for twilight mode */
+  :global([data-theme="twilight"]) .theme-toggle__icon {
+    color: #8b5cf6; /* Purple for twilight */
   }
   
   .theme-toggle__label {

@@ -62,6 +62,27 @@
   --backdrop-blur: blur(12px);
   --backdrop-brightness: brightness(1.05);
   --glass-opacity: 0.8;
+  
+  /* ==========================================================================
+     Dynamic Theme Adjustment Placeholders
+     Future: AI-driven personalization based on usage patterns
+     ========================================================================== */
+  
+  /* Contrast ratio adjustments - Placeholder for learned preferences */
+  --contrast-multiplier: 1.0; /* Future: 0.8-1.2 based on user comfort */
+  --brightness-adjustment: 1.0; /* Future: 0.9-1.1 based on ambient light */
+  
+  /* Typography scale adjustments - Placeholder for reading preferences */
+  --text-scale-factor: 1.0; /* Future: 0.9-1.2 based on visual comfort */
+  --line-height-factor: 1.0; /* Future: 0.9-1.1 based on reading patterns */
+  
+  /* Motion sensitivity - Placeholder for accessibility learning */
+  --motion-intensity: 1.0; /* Future: 0.0-1.0 based on motion tolerance */
+  --animation-duration-multiplier: 1.0; /* Future: 0.5-2.0 based on preference */
+  
+  /* Focus mode adjustments - Placeholder for productivity optimization */
+  --focus-opacity: 1.0; /* Future: Dim non-essential elements during deep work */
+  --focus-blur: 0px; /* Future: Background blur intensity for concentration */
 }
 
 /* ==========================================================================
@@ -178,6 +199,63 @@
   --shadow-elevation-highest: 0 25px 50px var(--shadow-color);
 }
 
+/* ==========================================================================
+   Twilight Mode - Sophisticated Light/Dark Blend
+   ========================================================================== */
+
+[data-theme="twilight"] {
+  /* Twilight: Warm backgrounds with high contrast text */
+  --color-background-primary: #1e1b2e;
+  --color-background-secondary: #2a2742;
+  --color-background-tertiary: #363350;
+  --color-background-elevated: #2a2742;
+  --color-background-overlay: rgba(30, 27, 46, 0.95);
+  
+  /* Twilight surfaces - Balanced between light and dark */
+  --color-surface-primary: #2a2742;
+  --color-surface-secondary: #363350;
+  --color-surface-muted: #4a4665;
+  --color-surface-hover: #413d5c;
+  --color-surface-pressed: #524e73;
+  
+  /* Twilight text - Warm whites with excellent readability */
+  --color-text-primary: #f4f1fe;
+  --color-text-secondary: #d4d0e8;
+  --color-text-tertiary: #a49bb8;
+  --color-text-quaternary: #7c7394;
+  --color-text-inverse: #1e1b2e;
+  
+  /* Twilight borders - Subtle purple tints */
+  --color-border-primary: #4a4665;
+  --color-border-secondary: #5c5478;
+  --color-border-muted: #413d5c;
+  --color-border-focus: #7c3aed;
+  
+  /* Twilight interactives - Purple and blue harmony */
+  --color-interactive-primary: #8b5cf6;
+  --color-interactive-primary-hover: #7c3aed;
+  --color-interactive-primary-pressed: #6d28d9;
+  --color-interactive-secondary: #60a5fa;
+  --color-interactive-muted: #a49bb8;
+  
+  /* Twilight status colors - Warmer variants */
+  --color-success: #34d399;
+  --color-success-muted: #065f46;
+  --color-warning: #fbbf24;
+  --color-warning-muted: #78350f;
+  --color-error: #f87171;
+  --color-error-muted: #991b1b;
+  --color-info: #38bdf8;
+  --color-info-muted: #0c4a6e;
+  
+  /* Twilight shadows - Deeper, more mysterious */
+  --shadow-color: rgba(14, 12, 23, 0.6);
+  --shadow-elevation-low: 0 1px 3px var(--shadow-color);
+  --shadow-elevation-medium: 0 4px 6px var(--shadow-color);
+  --shadow-elevation-high: 0 10px 15px var(--shadow-color);
+  --shadow-elevation-highest: 0 25px 50px var(--shadow-color);
+}
+
 /* Auto theme detection based on system preference */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
@@ -224,6 +302,77 @@
   }
 }
 
+/* ==========================================================================
+   Dynamic Theme Adjustments - Future AI Integration Placeholders
+   ========================================================================== */
+
+/* 
+  Ambient Light Adaptation - Placeholder for future sensor integration
+  TODO: Implement light sensor API when available
+  TODO: AI learning for preferred brightness curves throughout the day
+*/
+[data-ambient-light="low"] {
+  /* Reduce brightness and increase contrast for low light environments */
+  --brightness-adjustment: 0.9;
+  --contrast-multiplier: 1.1;
+}
+
+[data-ambient-light="high"] {
+  /* Increase brightness and reduce contrast for bright environments */
+  --brightness-adjustment: 1.1;
+  --contrast-multiplier: 0.95;
+}
+
+/*
+  Learned Contrast Preferences - Placeholder for user behavior analysis
+  TODO: AI analysis of user's text size adjustments
+  TODO: Eye strain detection and contrast optimization
+*/
+[data-contrast-preference="high"] {
+  --contrast-multiplier: 1.2;
+  --color-text-primary: color-mix(in srgb, var(--color-text-primary) 90%, #000000 10%);
+}
+
+[data-contrast-preference="low"] {
+  --contrast-multiplier: 0.85;
+  --color-text-primary: color-mix(in srgb, var(--color-text-primary) 85%, var(--color-text-secondary) 15%);
+}
+
+/*
+  Typography Scale Learning - Placeholder for reading behavior analysis
+  TODO: Track reading speed and comprehension patterns
+  TODO: Optimize font sizes based on content type and time of day
+*/
+[data-reading-mode="compact"] {
+  --text-scale-factor: 0.95;
+  --line-height-factor: 0.95;
+}
+
+[data-reading-mode="comfortable"] {
+  --text-scale-factor: 1.05;
+  --line-height-factor: 1.1;
+}
+
+/*
+  Focus Mode Intensity - Placeholder for productivity pattern learning
+  TODO: Detect deep work sessions and automatically adjust UI prominence
+  TODO: Learn optimal distraction reduction levels per user
+*/
+[data-focus-mode="deep"] {
+  --focus-opacity: 0.7;
+  --focus-blur: 2px;
+  
+  /* Reduce visual noise during deep focus */
+  * {
+    opacity: calc(var(--focus-opacity) * var(--motion-intensity));
+  }
+  
+  /* Keep primary content fully visible */
+  [data-focus-priority="high"] {
+    opacity: 1 !important;
+  }
+}
+
 /* Global base styles - "Almost invisible" foundation */
 * {
   box-sizing: border-box;
@@ -231,8 +380,8 @@
 
 html {
   font-family: var(--font-primary);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
+  font-size: calc(var(--font-size-base) * var(--text-scale-factor));
+  line-height: calc(var(--line-height-normal) * var(--line-height-factor));
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -247,28 +396,31 @@ body {
   background-color: var(--color-background-primary);
   color: var(--color-text-primary);
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
+  
+  /* Apply dynamic adjustments */
+  filter: brightness(var(--brightness-adjustment)) contrast(var(--contrast-multiplier));
 }
 
 /* Typography hierarchy with quiet intelligence */
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-semibold);
   letter-spacing: -0.02em;
-  line-height: var(--line-height-tight);
+  line-height: calc(var(--line-height-tight) * var(--line-height-factor));
   margin: 0;
   color: var(--color-text-primary);
 }
 
-h1 { font-size: var(--font-size-3xl); }
-h2 { font-size: var(--font-size-2xl); }
-h3 { font-size: var(--font-size-xl); }
-h4 { font-size: var(--font-size-lg); }
-h5 { font-size: var(--font-size-base); }
-h6 { font-size: var(--font-size-sm); }
+h1 { font-size: calc(var(--font-size-3xl) * var(--text-scale-factor)); }
+h2 { font-size: calc(var(--font-size-2xl) * var(--text-scale-factor)); }
+h3 { font-size: calc(var(--font-size-xl) * var(--text-scale-factor)); }
+h4 { font-size: calc(var(--font-size-lg) * var(--text-scale-factor)); }
+h5 { font-size: calc(var(--font-size-base) * var(--text-scale-factor)); }
+h6 { font-size: calc(var(--font-size-sm) * var(--text-scale-factor)); }
 
 /* Subtle paragraph styling */
 p {
   margin: 0;
-  line-height: var(--line-height-relaxed);
+  line-height: calc(var(--line-height-relaxed) * var(--line-height-factor));
   color: var(--color-text-secondary);
 }
 
@@ -279,7 +431,7 @@ button {
   border: none;
   background: none;
   cursor: pointer;
-  transition: all var(--transition-smooth);
+  transition: all calc(var(--transition-smooth) * var(--animation-duration-multiplier));
   color: inherit;
 }
 
@@ -290,7 +442,7 @@ input, textarea, select {
   border: none;
   background: none;
   outline: none;
-  transition: all var(--transition-smooth);
+  transition: all calc(var(--transition-smooth) * var(--animation-duration-multiplier));
   color: var(--color-text-primary);
 }
 
@@ -307,7 +459,7 @@ input, textarea, select {
 ::-webkit-scrollbar-thumb {
   background: var(--color-border-secondary);
   border-radius: 3px;
-  transition: background var(--transition-smooth);
+  transition: background calc(var(--transition-smooth) * var(--animation-duration-multiplier));
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -323,6 +475,11 @@ input, textarea, select {
 
 /* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-intensity: 0;
+    --animation-duration-multiplier: 0.01;
+  }
+  
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
