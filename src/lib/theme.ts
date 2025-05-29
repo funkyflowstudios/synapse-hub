@@ -19,7 +19,9 @@ class ThemeService {
    * Initialize theme from localStorage or system preference
    */
   private initializeTheme() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+      return;
+    }
 
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('synapse-theme') as ThemeOption | null;
@@ -34,7 +36,6 @@ class ThemeService {
     const currentDataTheme = document.documentElement.getAttribute('data-theme');
     if (currentDataTheme && ['light', 'dark', 'twilight'].includes(currentDataTheme)) {
       // Theme already applied by app.html script, ensure consistency
-      console.log('Theme already applied by app.html script:', currentDataTheme);
     } else {
       // Apply the initial theme if not already set
       this.applyTheme();
@@ -63,6 +64,12 @@ class ThemeService {
   private applyTheme() {
     if (typeof document === 'undefined') return;
 
+    // Ensure DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.applyTheme());
+      return;
+    }
+
     const isDark = this.getEffectiveTheme() === 'dark';
     
     // Always set explicit data-theme attribute for all themes
@@ -74,7 +81,8 @@ class ThemeService {
       document.documentElement.setAttribute('data-theme', 'twilight');
     } else if (this.currentTheme === 'auto') {
       // For auto mode, set explicit theme based on system preference
-      document.documentElement.setAttribute('data-theme', this.systemPrefersDark ? 'dark' : 'light');
+      const autoTheme = this.systemPrefersDark ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', autoTheme);
     }
   }
 
@@ -251,8 +259,29 @@ class ThemeService {
   }
 }
 
-// Create singleton instance
-export const themeService = new ThemeService();
+// Create singleton instance - initialize only in browser context
+let _themeService: ThemeService | null = null;
+
+function getThemeService(): ThemeService {
+  if (!_themeService && typeof window !== 'undefined') {
+    _themeService = new ThemeService();
+  }
+  return _themeService!;
+}
+
+export const themeService = {
+  getCurrentTheme: () => getThemeService().getCurrentTheme(),
+  getEffectiveTheme: () => getThemeService().getEffectiveTheme(),
+  setTheme: (theme: ThemeOption) => getThemeService().setTheme(theme),
+  toggleTheme: () => getThemeService().toggleTheme(),
+  isDark: () => getThemeService().isDark(),
+  subscribe: (callback: (theme: ThemeOption, isDark: boolean) => void) => getThemeService().subscribe(callback),
+  setAmbientLight: (level: 'low' | 'medium' | 'high') => getThemeService().setAmbientLight(level),
+  setContrastPreference: (pref: 'low' | 'normal' | 'high') => getThemeService().setContrastPreference(pref),
+  setReadingMode: (mode: 'compact' | 'normal' | 'comfortable') => getThemeService().setReadingMode(mode),
+  setFocusMode: (mode: 'normal' | 'deep') => getThemeService().setFocusMode(mode),
+  autoAdjustForTimeOfDay: () => getThemeService().autoAdjustForTimeOfDay()
+};
 
 // Svelte store-like interface for reactive components
 export function createThemeStore() {

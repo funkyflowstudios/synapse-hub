@@ -1,47 +1,84 @@
 <script lang="ts">
-  import { createThemeStore, type ThemeOption } from '$lib/theme';
+  import type { ThemeOption } from '$lib/theme';
+  import { onMount } from 'svelte';
   
-  // Create reactive theme store
-  const themeStore = createThemeStore();
+  // Simple reactive state
+  let currentTheme: ThemeOption = 'auto';
+  let isDark = false;
   
-  // Reactive values from the theme store
-  $: ({ theme, isDark } = $themeStore);
-  
-  /**
-   * Handle theme toggle - cycles through auto, light, dark, twilight
-   */
-  function handleToggle() {
-    if (theme === 'auto') {
-      themeStore.setTheme('light');
-    } else if (theme === 'light') {
-      themeStore.setTheme('dark');
-    } else if (theme === 'dark') {
-      themeStore.setTheme('twilight');
-    } else {
-      themeStore.setTheme('auto');
+  // Theme service functions (direct approach for better reactivity)
+  function applyTheme(theme: ThemeOption) {
+    if (typeof document === 'undefined') {
+      return theme;
     }
+    
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let effectiveTheme: string;
+    
+    if (theme === 'auto') {
+      effectiveTheme = systemPrefersDark ? 'dark' : 'light';
+    } else {
+      effectiveTheme = theme;
+    }
+    
+    // Apply the theme attribute
+    const htmlElement = document.documentElement;
+    htmlElement.setAttribute('data-theme', effectiveTheme);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('synapse-theme', theme);
+    } catch (e) {
+      console.warn('Failed to save theme to localStorage:', e);
+    }
+    
+    return effectiveTheme;
   }
   
-  /**
-   * Get display label for current theme
-   */
-  $: themeLabel = theme === 'auto' ? (isDark ? 'Auto (Dark)' : 'Auto (Light)') : 
-                  theme === 'light' ? 'Light' : 
-                  theme === 'dark' ? 'Dark' : 'Twilight';
+  function getStoredTheme(): ThemeOption {
+    if (typeof localStorage === 'undefined') return 'auto';
+    const stored = localStorage.getItem('synapse-theme') as ThemeOption;
+    return ['light', 'dark', 'twilight', 'auto'].includes(stored) ? stored : 'auto';
+  }
   
-  /**
-   * Get icon for current theme state
-   */
-  $: themeIcon = theme === 'auto' ? 'auto' : 
-                 theme === 'light' ? 'sun' : 
-                 theme === 'dark' ? 'moon' : 'twilight';
+  onMount(() => {
+    // Initialize theme
+    currentTheme = getStoredTheme();
+    const effective = applyTheme(currentTheme);
+    isDark = effective === 'dark' || effective === 'twilight';
+  });
+  
+  function handleToggle() {
+    // Cycle through themes: auto → light → dark → twilight → auto
+    if (currentTheme === 'auto') {
+      currentTheme = 'light';
+    } else if (currentTheme === 'light') {
+      currentTheme = 'dark';
+    } else if (currentTheme === 'dark') {
+      currentTheme = 'twilight';
+    } else {
+      currentTheme = 'auto';
+    }
+    
+    const effective = applyTheme(currentTheme);
+    isDark = effective === 'dark' || effective === 'twilight';
+  }
+  
+  // Display labels
+  $: themeLabel = currentTheme === 'auto' ? (isDark ? 'Auto (Dark)' : 'Auto (Light)') : 
+                  currentTheme === 'light' ? 'Light' : 
+                  currentTheme === 'dark' ? 'Dark' : 'Twilight';
+  
+  $: themeIcon = currentTheme === 'auto' ? 'auto' : 
+                 currentTheme === 'light' ? 'sun' : 
+                 currentTheme === 'dark' ? 'moon' : 'twilight';
 </script>
 
 <button
   class="theme-toggle"
   on:click={handleToggle}
   title="Switch theme: {themeLabel}"
-  aria-label="Switch theme to {theme === 'auto' ? 'light' : theme === 'light' ? 'dark' : theme === 'dark' ? 'twilight' : 'auto'} mode"
+  aria-label="Switch theme"
 >
   <div class="theme-toggle__icon" class:theme-toggle__icon--dark={isDark}>
     {#if themeIcon === 'sun'}
@@ -90,75 +127,62 @@
   .theme-toggle {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-surface-secondary);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-md);
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--transition-smooth);
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface-secondary, #f8fafc);
+    border: 1px solid var(--color-border-primary, #e2e8f0);
+    border-radius: 0.5rem;
+    color: var(--color-text-secondary, #64748b);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 250ms ease;
     cursor: pointer;
-    
-    /* Sophisticated hover effects */
-    backdrop-filter: var(--backdrop-blur);
-    box-shadow: var(--shadow-elevation-low);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .theme-toggle:hover {
-    background: var(--color-surface-hover);
-    border-color: var(--color-border-secondary);
-    color: var(--color-text-primary);
+    background: var(--color-surface-hover, #f1f5f9);
+    border-color: var(--color-border-secondary, #cbd5e1);
+    color: var(--color-text-primary, #0f172a);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-elevation-medium);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .theme-toggle:active {
     transform: translateY(0);
-    box-shadow: var(--shadow-elevation-low);
-  }
-  
-  .theme-toggle:focus-visible {
-    border-color: var(--color-border-focus);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .theme-toggle__icon {
     width: 18px;
     height: 18px;
-    color: var(--color-interactive-muted);
-    transition: all var(--transition-smooth);
+    color: var(--color-interactive-muted, #94a3b8);
+    transition: all 250ms ease;
     transform-origin: center;
   }
   
   .theme-toggle__icon svg {
     width: 100%;
     height: 100%;
-    transition: all var(--transition-smooth);
+    transition: all 250ms ease;
   }
   
-  /* Icon color states */
   .theme-toggle:hover .theme-toggle__icon {
-    color: var(--color-interactive-primary);
+    color: var(--color-interactive-primary, #3b82f6);
     transform: scale(1.1);
   }
   
   .theme-toggle__icon--dark {
-    color: var(--color-interactive-secondary);
-  }
-  
-  /* Special styling for twilight mode */
-  :global([data-theme="twilight"]) .theme-toggle__icon {
-    color: #8b5cf6; /* Purple for twilight */
+    color: var(--color-interactive-secondary, #8b5cf6);
   }
   
   .theme-toggle__label {
-    font-size: var(--font-size-xs);
+    font-size: 0.75rem;
     letter-spacing: 0.025em;
     text-transform: uppercase;
     opacity: 0.8;
-    transition: opacity var(--transition-smooth);
+    transition: opacity 250ms ease;
   }
   
   .theme-toggle:hover .theme-toggle__label {
@@ -180,18 +204,6 @@
     
     .theme-toggle:hover .theme-toggle__icon {
       transform: none;
-    }
-  }
-  
-  /* High contrast mode */
-  @media (prefers-contrast: high) {
-    .theme-toggle {
-      border: 2px solid var(--color-border-primary);
-      background: var(--color-background-primary);
-    }
-    
-    .theme-toggle:hover {
-      border-color: var(--color-interactive-primary);
     }
   }
 </style> 

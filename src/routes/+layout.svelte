@@ -9,7 +9,7 @@
 	// Initialize theme service on mount to ensure proper theme application
 	onMount(() => {
 		// Theme service auto-initializes, but this ensures it runs in browser context
-		console.log('Theme service initialized:', themeService.getCurrentTheme());
+		themeService.getCurrentTheme();
 	});
 </script>
 
