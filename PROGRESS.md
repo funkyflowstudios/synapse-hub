@@ -2,6 +2,8 @@
 
 This document tracks the development progress made by the Cursor AI Agent.
 
+**🔗 GitHub Repository**: https://github.com/funkyflowstudios/synapse-hub
+
 ## Phase 0: Project Setup & Foundational Rules ✅
 
 **Date:** May 29, 2025  
