@@ -64,6 +64,166 @@
   --glass-opacity: 0.8;
 }
 
+/* ==========================================================================
+   Core Theming Engine - Light Theme (Default)
+   ========================================================================== */
+
+:root {
+  /* Light Theme Color Palette */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+  --color-background-elevated: #ffffff;
+  --color-background-overlay: rgba(255, 255, 255, 0.95);
+  
+  /* Surface colors for panels and components */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8fafc;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-hover: #f8fafc;
+  --color-surface-pressed: #e2e8f0;
+  
+  /* Text colors with sophisticated hierarchy */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #64748b;
+  --color-text-quaternary: #94a3b8;
+  --color-text-inverse: #ffffff;
+  
+  /* Border colors for subtle definition */
+  --color-border-primary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --color-border-muted: #f1f5f9;
+  --color-border-focus: #3b82f6;
+  
+  /* Interactive element colors */
+  --color-interactive-primary: #3b82f6;
+  --color-interactive-primary-hover: #2563eb;
+  --color-interactive-primary-pressed: #1d4ed8;
+  --color-interactive-secondary: #6366f1;
+  --color-interactive-muted: #64748b;
+  
+  /* Status and feedback colors */
+  --color-success: #059669;
+  --color-success-muted: #d1fae5;
+  --color-warning: #d97706;
+  --color-warning-muted: #fef3c7;
+  --color-error: #dc2626;
+  --color-error-muted: #fee2e2;
+  --color-info: #0ea5e9;
+  --color-info-muted: #e0f2fe;
+  
+  /* Light theme shadows with subtle depth */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-elevation-low: 0 1px 3px var(--shadow-color);
+  --shadow-elevation-medium: 0 4px 6px var(--shadow-color);
+  --shadow-elevation-high: 0 10px 15px var(--shadow-color);
+  --shadow-elevation-highest: 0 25px 50px var(--shadow-color);
+}
+
+/* ==========================================================================
+   Dark Theme Implementation
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* Dark Theme Color Palette */
+  --color-background-primary: #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-background-tertiary: #334155;
+  --color-background-elevated: #1e293b;
+  --color-background-overlay: rgba(15, 23, 42, 0.95);
+  
+  /* Dark surface colors */
+  --color-surface-primary: #1e293b;
+  --color-surface-secondary: #334155;
+  --color-surface-muted: #475569;
+  --color-surface-hover: #374151;
+  --color-surface-pressed: #4b5563;
+  
+  /* Dark text colors with proper contrast */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-tertiary: #94a3b8;
+  --color-text-quaternary: #64748b;
+  --color-text-inverse: #0f172a;
+  
+  /* Dark border colors */
+  --color-border-primary: #374151;
+  --color-border-secondary: #4b5563;
+  --color-border-muted: #374151;
+  --color-border-focus: #60a5fa;
+  
+  /* Dark interactive colors */
+  --color-interactive-primary: #60a5fa;
+  --color-interactive-primary-hover: #3b82f6;
+  --color-interactive-primary-pressed: #2563eb;
+  --color-interactive-secondary: #818cf8;
+  --color-interactive-muted: #94a3b8;
+  
+  /* Dark status colors */
+  --color-success: #10b981;
+  --color-success-muted: #064e3b;
+  --color-warning: #f59e0b;
+  --color-warning-muted: #451a03;
+  --color-error: #ef4444;
+  --color-error-muted: #7f1d1d;
+  --color-info: #06b6d4;
+  --color-info-muted: #164e63;
+  
+  /* Dark theme shadows */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-elevation-low: 0 1px 3px var(--shadow-color);
+  --shadow-elevation-medium: 0 4px 6px var(--shadow-color);
+  --shadow-elevation-high: 0 10px 15px var(--shadow-color);
+  --shadow-elevation-highest: 0 25px 50px var(--shadow-color);
+}
+
+/* Auto theme detection based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    /* Automatically apply dark theme variables when no explicit theme is set */
+    --color-background-primary: #0f172a;
+    --color-background-secondary: #1e293b;
+    --color-background-tertiary: #334155;
+    --color-background-elevated: #1e293b;
+    --color-background-overlay: rgba(15, 23, 42, 0.95);
+    
+    --color-surface-primary: #1e293b;
+    --color-surface-secondary: #334155;
+    --color-surface-muted: #475569;
+    --color-surface-hover: #374151;
+    --color-surface-pressed: #4b5563;
+    
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-tertiary: #94a3b8;
+    --color-text-quaternary: #64748b;
+    --color-text-inverse: #0f172a;
+    
+    --color-border-primary: #374151;
+    --color-border-secondary: #4b5563;
+    --color-border-muted: #374151;
+    --color-border-focus: #60a5fa;
+    
+    --color-interactive-primary: #60a5fa;
+    --color-interactive-primary-hover: #3b82f6;
+    --color-interactive-primary-pressed: #2563eb;
+    --color-interactive-secondary: #818cf8;
+    --color-interactive-muted: #94a3b8;
+    
+    --color-success: #10b981;
+    --color-success-muted: #064e3b;
+    --color-warning: #f59e0b;
+    --color-warning-muted: #451a03;
+    --color-error: #ef4444;
+    --color-error-muted: #7f1d1d;
+    --color-info: #06b6d4;
+    --color-info-muted: #164e63;
+    
+    --shadow-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
 /* Global base styles - "Almost invisible" foundation */
 * {
   box-sizing: border-box;
@@ -84,6 +244,9 @@ body {
   min-height: 100vh;
   font-weight: var(--font-weight-normal);
   letter-spacing: -0.01em; /* Subtle letter spacing for sophistication */
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
 
 /* Typography hierarchy with quiet intelligence */
@@ -92,6 +255,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
   line-height: var(--line-height-tight);
   margin: 0;
+  color: var(--color-text-primary);
 }
 
 h1 { font-size: var(--font-size-3xl); }
@@ -105,6 +269,7 @@ h6 { font-size: var(--font-size-sm); }
 p {
   margin: 0;
   line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
 }
 
 /* Clean button foundation */
@@ -115,6 +280,7 @@ button {
   background: none;
   cursor: pointer;
   transition: all var(--transition-smooth);
+  color: inherit;
 }
 
 /* Clean input foundation */
@@ -125,6 +291,7 @@ input, textarea, select {
   background: none;
   outline: none;
   transition: all var(--transition-smooth);
+  color: var(--color-text-primary);
 }
 
 /* Scrollbar styling for sophistication */
@@ -138,18 +305,18 @@ input, textarea, select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--color-border-secondary);
   border-radius: 3px;
   transition: background var(--transition-smooth);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--color-interactive-muted);
 }
 
 /* Focus indicators for accessibility */
 :focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
