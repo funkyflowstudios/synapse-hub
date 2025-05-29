@@ -58,18 +58,17 @@ class ThemeService {
 
     const isDark = this.getEffectiveTheme() === 'dark';
     
-    // Remove existing theme attributes
-    document.documentElement.removeAttribute('data-theme');
-    
-    // Apply theme based on current selection
+    // Always set explicit data-theme attribute for all themes
     if (this.currentTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
     } else if (this.currentTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
     } else if (this.currentTheme === 'twilight') {
       document.documentElement.setAttribute('data-theme', 'twilight');
+    } else if (this.currentTheme === 'auto') {
+      // For auto mode, set explicit theme based on system preference
+      document.documentElement.setAttribute('data-theme', this.systemPrefersDark ? 'dark' : 'light');
     }
-    // For 'auto', we rely on CSS media queries and don't set data-theme
   }
 
   /**
