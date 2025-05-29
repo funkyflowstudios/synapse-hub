@@ -28,6 +28,8 @@ vite.config.ts.timestamp-*
 
 # Paraglide
 src/lib/paraglide
+project.inlang/cache/
+project.inlang/project_id
 
 *storybook.log
 storybook-static
@@ -55,4 +57,5 @@ coverage/
 Synapse_Hub_UI_Design.md
 *.design.md
 docs/internal/
+PROGRESS.md
 
