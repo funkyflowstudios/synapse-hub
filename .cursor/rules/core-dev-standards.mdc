@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Core Development Standards
+
+## Code Quality
+- All JavaScript/TypeScript code must adhere to modern ESNext standards.
+- Use Prettier for code formatting (configure a .prettierrc file with sensible defaults like single quotes, trailing commas).
+- Use ESLint for code linting (configure a basic ESLint setup for the chosen framework).
+- All components should be modular and well-documented with JSDoc or TSDoc comments.
+
+## Version Control
+- Commit messages should follow conventional commit guidelines.
+- Before committing, ensure all linters and formatters pass, and all tests are green.
+
+## Accessibility
+- Prioritize semantic HTML and ARIA attributes for accessibility as per @docs Synapse_Hub_UI_Design (source 88).
+- All interactive elements must be keyboard accessible.
+- Maintain proper focus management and color contrast ratios.

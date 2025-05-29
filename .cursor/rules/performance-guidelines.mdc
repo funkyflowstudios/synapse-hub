@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Performance Guidelines
+
+## Animation & Rendering
+- Strive for sub-50ms Long Animation Frames (LoAF) as per @docs Synapse_Hub_UI_Design (source 6).
+- Implement GPU-accelerated transitions and effects by default using CSS transforms and opacity, or WebGL where appropriate (@docs Synapse_Hub_UI_Design (source 8)).
+- All animations should use `transform` and `opacity` properties when possible to maintain 60fps.
+
+## Background Processing
+- Utilize Web Workers extensively for non-UI critical tasks (@docs Synapse_Hub_UI_Design (source 9)).
+- Offload data processing, API calls, and complex calculations to Web Workers.
+- Keep the main thread focused on UI interactions and rendering.
+
+## Resource Loading
+- Employ proactive resource loading for critical path assets only, based on predictive AI if feasible (as per @docs Synapse_Hub_UI_Design (source 7)). Initially, focus on identifying critical assets.
+- Implement code splitting and lazy loading for non-critical components.
+- Use optimized image formats (WebP, AVIF) and responsive images.
+
+## Bundle Optimization
+- Target sub-100ms interactive shell load time.
+- Minimize JavaScript bundle size through tree-shaking and code splitting.
+- Use dynamic imports for route-based code splitting.
