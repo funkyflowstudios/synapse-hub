@@ -37,4 +37,4 @@ We prefer all communications to be in English.
 
 - We will respond to your report within 72 hours with our evaluation of the report
 - If the issue is confirmed, we will release a patch as soon as possible depending on complexity
-- We will maintain an open dialogue to discuss the issue until it's resolved 
+- We will maintain an open dialogue to discuss the issue until it's resolved

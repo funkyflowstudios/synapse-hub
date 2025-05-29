@@ -18,13 +18,16 @@ Thank you for your interest in contributing to Synapse Hub! We welcome contribut
 ## 📋 Development Guidelines
 
 ### Code Standards
+
 - Follow the existing code style (Prettier + ESLint)
 - Write TypeScript with proper types
 - Add tests for new functionality
 - Update documentation as needed
 
 ### Commit Messages
+
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
 - `feat:` new features
 - `fix:` bug fixes
 - `docs:` documentation changes
@@ -34,16 +37,19 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` maintenance tasks
 
 ### Testing
+
 - Unit tests: `npm run test:unit`
 - E2E tests: `npm run test:e2e`
 - All tests must pass before submitting PR
 
 ### Performance
+
 - Follow performance guidelines (sub-100ms load time)
 - Use Web Workers for heavy computations
 - Optimize animations for 60fps
 
 ### Accessibility
+
 - Maintain WCAG 2.2+ AAA compliance
 - Test with keyboard navigation
 - Provide proper ARIA labels
@@ -51,6 +57,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ## 🐛 Bug Reports
 
 When filing a bug report, please include:
+
 - Clear description of the issue
 - Steps to reproduce
 - Expected vs actual behavior
@@ -60,6 +67,7 @@ When filing a bug report, please include:
 ## 💡 Feature Requests
 
 For feature requests:
+
 - Describe the problem you're solving
 - Explain your proposed solution
 - Consider alternative solutions
@@ -71,4 +79,4 @@ Be respectful, inclusive, and professional in all interactions.
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under the MIT License. 
+By contributing, you agree that your contributions will be licensed under the MIT License.

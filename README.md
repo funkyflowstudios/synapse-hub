@@ -22,7 +22,8 @@ A high-performance, AI-powered intelligent interface built with SvelteKit. Featu
 ## 🏃‍♂️ Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm/pnpm/yarn
 
 ### Installation
@@ -73,6 +74,7 @@ src/
 ## 🧪 Testing
 
 The project includes comprehensive testing setup:
+
 - **Unit Tests**: Component and logic testing with Vitest
 - **E2E Tests**: End-to-end testing with Playwright
 - **Storybook Tests**: Component interaction testing
@@ -80,6 +82,7 @@ The project includes comprehensive testing setup:
 ## 🚀 Deployment
 
 Built for deployment on modern platforms:
+
 - Vercel, Netlify, or any Node.js hosting
 - Static site generation supported
 - Optimized builds with code splitting
