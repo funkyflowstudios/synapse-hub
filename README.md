@@ -1,38 +1,97 @@
-# sv
+# Synapse Hub
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A high-performance, AI-powered intelligent interface built with SvelteKit. Features dynamic UIs, liquid crystal controls, and sub-100ms performance targets.
 
-## Creating a project
+## 🚀 Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **High Performance**: Sub-100ms interactive shell load time
+- **Dynamic UI**: Adaptive layouts with liquid crystal controls
+- **AI-Powered**: Intelligent interface components
+- **Accessibility**: WCAG 2.2+ AAA compliance
+- **Modern Stack**: SvelteKit + TypeScript + TailwindCSS
+
+## 🛠 Tech Stack
+
+- **Framework**: SvelteKit with TypeScript
+- **Styling**: TailwindCSS
+- **Testing**: Vitest + Playwright
+- **Development**: Storybook for component development
+- **Quality**: ESLint + Prettier
+- **Database**: Drizzle ORM with SQLite
+
+## 🏃‍♂️ Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- npm/pnpm/yarn
+
+### Installation
 
 ```bash
-# create a new project in the current directory
-npx sv create
+# Clone the repository
+git clone https://github.com/funkyflowstudios/synapse-hub.git
+cd synapse-hub
 
-# create a new project in my-app
-npx sv create my-app
-```
+# Install dependencies
+npm install
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+# Start development server
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
+### Available Scripts
 
 ```bash
-npm run build
+# Development
+npm run dev          # Start dev server
+npm run build        # Build for production
+npm run preview      # Preview production build
+
+# Testing
+npm test            # Run all tests
+npm run test:unit   # Unit tests only
+npm run test:e2e    # End-to-end tests only
+
+# Development Tools
+npm run storybook   # Start Storybook
+npm run lint        # Lint code
+npm run format      # Format code
 ```
 
-You can preview the production build with `npm run preview`.
+## 📁 Project Structure
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```
+src/
+├── components/     # Reusable UI components
+├── lib/           # Utilities and shared code
+├── routes/        # SvelteKit routes
+├── styles/        # Global styles and themes
+├── workers/       # Web Workers for background tasks
+└── stories/       # Storybook stories
+```
+
+## 🧪 Testing
+
+The project includes comprehensive testing setup:
+- **Unit Tests**: Component and logic testing with Vitest
+- **E2E Tests**: End-to-end testing with Playwright
+- **Storybook Tests**: Component interaction testing
+
+## 🚀 Deployment
+
+Built for deployment on modern platforms:
+- Vercel, Netlify, or any Node.js hosting
+- Static site generation supported
+- Optimized builds with code splitting
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions welcome! Please read our contributing guidelines and code of conduct.
+
+---
+
+Built with ❤️ using SvelteKit

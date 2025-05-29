@@ -32,7 +32,27 @@ src/lib/paraglide
 *storybook.log
 storybook-static
 
-#Other
+# Development-specific files (should not be in public repo)
+.cursor/
+*.log
+*.pid
+*.seed
+*.pid.lock
 
-PROGRESS.md
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Other development artifacts
+coverage/
+.nyc_output
+.cache
+
+# Design documents and sensitive project files
+Synapse_Hub_UI_Design.md
+*.design.md
+docs/internal/
 
