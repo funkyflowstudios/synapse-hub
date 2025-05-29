@@ -21,9 +21,14 @@
       effectiveTheme = theme;
     }
     
-    // Apply the theme attribute
+    // Apply the theme attribute IMMEDIATELY
     const htmlElement = document.documentElement;
     htmlElement.setAttribute('data-theme', effectiveTheme);
+    
+    // Force a style recalculation to ensure immediate visual change
+    htmlElement.style.display = 'none';
+    htmlElement.offsetHeight; // Trigger reflow
+    htmlElement.style.display = '';
     
     // Save to localStorage
     try {
@@ -41,8 +46,28 @@
     return ['light', 'dark', 'twilight', 'auto'].includes(stored) ? stored : 'auto';
   }
   
+  function getCurrentThemeFromDOM(): ThemeOption {
+    if (typeof document === 'undefined') return 'auto';
+    const dataTheme = document.documentElement.getAttribute('data-theme');
+    
+    // Try to determine the current theme from DOM and localStorage
+    const stored = getStoredTheme();
+    
+    // If stored theme is not 'auto', use it
+    if (stored !== 'auto') {
+      return stored;
+    }
+    
+    // If stored is 'auto', determine from data-theme attribute
+    if (dataTheme === 'dark') return 'auto'; // Could be auto-dark
+    if (dataTheme === 'light') return 'auto'; // Could be auto-light
+    if (dataTheme === 'twilight') return 'twilight';
+    
+    return 'auto';
+  }
+  
   onMount(() => {
-    // Initialize theme
+    // Initialize theme - check both localStorage and current DOM state
     currentTheme = getStoredTheme();
     const effective = applyTheme(currentTheme);
     isDark = effective === 'dark' || effective === 'twilight';
@@ -62,6 +87,13 @@
     
     const effective = applyTheme(currentTheme);
     isDark = effective === 'dark' || effective === 'twilight';
+    
+    // Dispatch custom event to notify other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('themeChanged', { 
+        detail: { theme: currentTheme, effective, isDark }
+      }));
+    }
   }
   
   // Display labels

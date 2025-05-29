@@ -67,7 +67,7 @@
           
           <div class="setting-group">
             <span class="setting-label">Theme</span>
-            <p class="setting-description">Choose your preferred theme mode</p>
+            <p class="setting-description">Choose your preferred theme mode (changes immediately)</p>
             <div class="setting-control">
               <ThemeToggle />
             </div>
@@ -148,13 +148,14 @@
       <footer class="modal-footer">
         <div class="footer-info">
           <p class="version-info">Synapse Hub v2.0 • Phase 2 Complete</p>
+          <p class="settings-note">Theme changes apply immediately • Save Changes applies to accessibility & performance settings</p>
         </div>
         <div class="footer-actions">
           <button class="secondary-button" on:click={closeModal}>
             Cancel
           </button>
           <button class="primary-button" on:click={closeModal}>
-            Save Changes
+            Done
           </button>
         </div>
       </footer>
@@ -357,8 +358,15 @@
   
   .version-info {
     font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-muted);
     margin: 0;
+  }
+  
+  .settings-note {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: var(--spacing-xs) 0 0 0;
+    opacity: 0.8;
   }
   
   .footer-actions {
