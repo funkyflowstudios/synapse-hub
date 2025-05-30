@@ -104,6 +104,7 @@ interface Message {
 	timestamp: Date;
 	type: 'text' | 'code' | 'file';
 	files?: UploadedFile[];
+	multicast: boolean; // Indicates message sent to multiple agents
 }
 
 interface UploadedFile {
@@ -120,23 +121,27 @@ interface UploadedFile {
 #### Event Dispatchers
 
 ```typescript
-// Agent selection
-dispatch('agentSelected', { agent: 'cursor' | 'gemini' });
+// Multi-agent selection
+dispatch('agentSelected', { agents: Array<'cursor' | 'gemini'> });
 
 // A2A collaboration toggle
 dispatch('a2aToggle', { enabled: boolean });
 
-// Message sending
-dispatch('messagesSent', { message: Message, agent: string });
+// Message sending with multi-agent support
+dispatch('messagesSent', { message: Message, agents: Array<string> });
 ```
 
 #### Key Features
 
 **Agent Selection**
 
-- Toggle between Cursor and Gemini AI
+- Multi-agent selection (Cursor and/or Gemini AI)
 - Visual status indicators with green border when active
+- Consistent button styling matching platform selectors
 - A2A collaboration toggle switch
+- Multi-agent cost warning with API credit calculation
+- Fixed layout preventing height changes during agent selection
+- Inline warning messages positioned to maintain UI stability
 
 **File Upload System**
 
@@ -160,6 +165,7 @@ dispatch('messagesSent', { message: Message, agent: string });
 - File attachments with preview capabilities
 - Auto-scroll behavior with user scroll detection
 - Message timestamps and sender identification
+- Multi-agent message indicators for collaborative conversations
 
 #### Advanced Capabilities
 

@@ -271,291 +271,297 @@
 	class:minimized={isMinimized}
 	aria-label="Development Monitoring Panel"
 >
-	<!-- Project Status (always visible) -->
-	<section class="monitoring-section">
-		<button
-			class="section-header clickable-header"
-			on:click={() => toggleSection('project')}
-			title={expandedSections.project ? 'Show less' : 'Show more'}
-		>
-			<h2 class="section-title">Project Status</h2>
-			<div class="expand-btn" class:expanded={expandedSections.project}>
-				{expandedSections.project ? '−' : '+'}
-			</div>
-		</button>
-
-		<div class="status-summary">
-			<div class="app-status">
-				<div class="status-indicator">
-					<span
-						class="status-dot"
-						style="background: {getStatusColor(projectStatus.application.status)}"
-					></span>
-					<span class="app-name">{projectStatus.application.name}</span>
-				</div>
-				<div class="resource-usage">
-					<span class="usage-item">CPU: {projectStatus.application.cpu}</span>
-					<span class="usage-item">RAM: {projectStatus.application.memory}</span>
-				</div>
-			</div>
-			<div class="vcs-status">
-				<span class="branch">{projectStatus.vcs.branch}</span>
-				<span class="changes" style="color: {getStatusColor(projectStatus.vcs.status)}">
-					{projectStatus.vcs.uncommittedChanges} changes
-				</span>
-			</div>
-		</div>
-
-		{#if expandedSections.project}
-			<div class="status-details" transition:slide={{ duration: 300 }}>
-				<div class="detail-grid">
-					<div class="detail-item">
-						<span class="detail-label">PID:</span>
-						<span class="detail-value">{projectStatus.application.pid}</span>
-					</div>
-					<div class="detail-item">
-						<span class="detail-label">Uptime:</span>
-						<span class="detail-value">{projectStatus.application.uptime}</span>
-					</div>
-					<div class="detail-item">
-						<span class="detail-label">Last Commit:</span>
-						<span class="detail-value">{projectStatus.vcs.lastCommit}</span>
-					</div>
-				</div>
-			</div>
-		{/if}
-	</section>
-
-	<!-- Build & Tests -->
-	<section class="monitoring-section">
-		<button
-			class="section-header clickable-header"
-			on:click={() => toggleSection('build')}
-			title={expandedSections.build ? 'Show less' : 'Show more'}
-		>
-			<h2 class="section-title">Build & Tests</h2>
-			<div class="expand-btn" class:expanded={expandedSections.build}>
-				{expandedSections.build ? '−' : '+'}
-			</div>
-		</button>
-
-		<div class="build-summary">
-			<div class="build-status">
-				<span class="status-indicator">
-					<span class="status-dot" style="background: {getStatusColor(buildStatus.ci.status)}"
-					></span>
-					<span>CI: Build #{buildStatus.ci.buildNumber}</span>
-				</span>
-				<span class="build-time">{buildStatus.ci.duration}</span>
-			</div>
-			<div class="test-status">
-				<span
-					class="test-ratio"
-					style="color: {buildStatus.tests.failed > 0
-						? 'var(--color-error)'
-						: 'var(--color-success)'}"
+	<div class="monitoring-content">
+		<!-- Project Status (always visible) -->
+		<section class="monitoring-section">
+			<div class="section-header">
+				<h2 class="section-title">Project Status</h2>
+				<button
+					class="expand-btn"
+					class:expanded={expandedSections.project}
+					on:click={() => toggleSection('project')}
+					title={expandedSections.project ? 'Show less' : 'Show more'}
+					aria-label={expandedSections.project ? 'Collapse project status section' : 'Expand project status section'}
 				>
-					Tests: {buildStatus.tests.passed}/{buildStatus.tests.total}
-				</span>
-				<span class="coverage">Coverage: {buildStatus.tests.coverage}%</span>
+					{expandedSections.project ? '−' : '+'}
+				</button>
 			</div>
-		</div>
 
-		{#if expandedSections.build}
-			<div class="build-details" transition:slide={{ duration: 300 }}>
-				<div class="detail-grid">
-					<div class="detail-item">
-						<span class="detail-label">Local Build:</span>
+			<div class="status-summary">
+				<div class="app-status">
+					<div class="status-indicator">
 						<span
-							class="detail-value"
-							style="color: {getStatusColor(buildStatus.localBuild.status)}"
-						>
-							{buildStatus.localBuild.status} ({buildStatus.localBuild.duration})
-						</span>
+							class="status-dot"
+							style="background: {getStatusColor(projectStatus.application.status)}"
+						></span>
+						<span class="app-name">{projectStatus.application.name}</span>
 					</div>
-					<div class="detail-item">
-						<span class="detail-label">Test Duration:</span>
-						<span class="detail-value">{buildStatus.tests.duration}</span>
+					<div class="resource-usage">
+						<span class="usage-item">CPU: {projectStatus.application.cpu}</span>
+						<span class="usage-item">RAM: {projectStatus.application.memory}</span>
 					</div>
 				</div>
-				<button class="action-btn" on:click={runTests}> Run Tests </button>
-			</div>
-		{/if}
-	</section>
-
-	<!-- Development Environment -->
-	<section class="monitoring-section">
-		<button
-			class="section-header clickable-header"
-			on:click={() => toggleSection('environment')}
-			title={expandedSections.environment ? 'Show less' : 'Show more'}
-		>
-			<h2 class="section-title">Environment</h2>
-			<div class="expand-btn" class:expanded={expandedSections.environment}>
-				{expandedSections.environment ? '−' : '+'}
-			</div>
-		</button>
-
-		{#if expandedSections.environment}
-			<div class="environment-details" transition:slide={{ duration: 300 }}>
-				<div class="sdk-list">
-					<h4 class="subsection-title">Active SDKs</h4>
-					{#each environment.sdks as sdk (sdk.name)}
-						<div class="sdk-item">
-							<span class="sdk-name">{sdk.name}</span>
-							<span class="sdk-version">{sdk.version}</span>
-						</div>
-					{/each}
+				<div class="vcs-status">
+					<span class="branch">{projectStatus.vcs.branch}</span>
+					<span class="changes" style="color: {getStatusColor(projectStatus.vcs.status)}">
+						{projectStatus.vcs.uncommittedChanges} changes
+					</span>
 				</div>
+			</div>
 
-				<div class="resources-info">
-					<h4 class="subsection-title">System Resources</h4>
-					<div class="resource-grid">
-						<div class="resource-item">
-							<span class="resource-label">Free Disk:</span>
-							<span class="resource-value">{environment.resources.freeDisk}</span>
+			{#if expandedSections.project}
+				<div class="status-details" transition:slide={{ duration: 300 }}>
+					<div class="detail-grid">
+						<div class="detail-item">
+							<span class="detail-label">PID:</span>
+							<span class="detail-value">{projectStatus.application.pid}</span>
 						</div>
-						<div class="resource-item">
-							<span class="resource-label">Available RAM:</span>
-							<span class="resource-value">{environment.resources.availableRam}</span>
+						<div class="detail-item">
+							<span class="detail-label">Uptime:</span>
+							<span class="detail-value">{projectStatus.application.uptime}</span>
+						</div>
+						<div class="detail-item">
+							<span class="detail-label">Last Commit:</span>
+							<span class="detail-value">{projectStatus.vcs.lastCommit}</span>
 						</div>
 					</div>
 				</div>
-			</div>
-		{/if}
-	</section>
+			{/if}
+		</section>
 
-	<!-- Live Logs -->
-	<section class="monitoring-section">
-		<div class="section-header-wrapper">
-			<button
-				class="section-header clickable-header"
-				on:click={() => toggleSection('logs')}
-				title={expandedSections.logs ? 'Show less' : 'Show more'}
-			>
+		<!-- Build & Tests -->
+		<section class="monitoring-section">
+			<div class="section-header">
+				<h2 class="section-title">Build & Tests</h2>
+				<button
+					class="expand-btn"
+					class:expanded={expandedSections.build}
+					on:click={() => toggleSection('build')}
+					title={expandedSections.build ? 'Show less' : 'Show more'}
+					aria-label={expandedSections.build ? 'Collapse build and tests section' : 'Expand build and tests section'}
+				>
+					{expandedSections.build ? '−' : '+'}
+				</button>
+			</div>
+
+			<div class="build-summary">
+				<div class="build-status">
+					<span class="status-indicator">
+						<span class="status-dot" style="background: {getStatusColor(buildStatus.ci.status)}"
+						></span>
+						<span>CI: Build #{buildStatus.ci.buildNumber}</span>
+					</span>
+					<span class="build-time">{buildStatus.ci.duration}</span>
+				</div>
+				<div class="test-status">
+					<span
+						class="test-ratio"
+						style="color: {buildStatus.tests.failed > 0
+							? 'var(--color-error)'
+							: 'var(--color-success)'}"
+					>
+						Tests: {buildStatus.tests.passed}/{buildStatus.tests.total}
+					</span>
+					<span class="coverage">Coverage: {buildStatus.tests.coverage}%</span>
+				</div>
+			</div>
+
+			{#if expandedSections.build}
+				<div class="build-details" transition:slide={{ duration: 300 }}>
+					<div class="detail-grid">
+						<div class="detail-item">
+							<span class="detail-label">Local Build:</span>
+							<span
+								class="detail-value"
+								style="color: {getStatusColor(buildStatus.localBuild.status)}"
+							>
+								{buildStatus.localBuild.status} ({buildStatus.localBuild.duration})
+							</span>
+						</div>
+						<div class="detail-item">
+							<span class="detail-label">Test Duration:</span>
+							<span class="detail-value">{buildStatus.tests.duration}</span>
+						</div>
+					</div>
+					<button class="action-btn" on:click={runTests} aria-label="Run tests"> Run Tests </button>
+				</div>
+			{/if}
+		</section>
+
+		<!-- Development Environment -->
+		<section class="monitoring-section">
+			<div class="section-header">
+				<h2 class="section-title">Environment</h2>
+				<button
+					class="expand-btn"
+					class:expanded={expandedSections.environment}
+					on:click={() => toggleSection('environment')}
+					title={expandedSections.environment ? 'Show less' : 'Show more'}
+					aria-label={expandedSections.environment ? 'Collapse environment section' : 'Expand environment section'}
+				>
+					{expandedSections.environment ? '−' : '+'}
+				</button>
+			</div>
+
+			{#if expandedSections.environment}
+				<div class="environment-details" transition:slide={{ duration: 300 }}>
+					<div class="sdk-list">
+						<h4 class="subsection-title">Active SDKs</h4>
+						{#each environment.sdks as sdk (sdk.name)}
+							<div class="sdk-item">
+								<span class="sdk-name">{sdk.name}</span>
+								<span class="sdk-version">{sdk.version}</span>
+							</div>
+						{/each}
+					</div>
+
+					<div class="resources-info">
+						<h4 class="subsection-title">System Resources</h4>
+						<div class="resource-grid">
+							<div class="resource-item">
+								<span class="resource-label">Free Disk:</span>
+								<span class="resource-value">{environment.resources.freeDisk}</span>
+							</div>
+							<div class="resource-item">
+								<span class="resource-label">Available RAM:</span>
+								<span class="resource-value">{environment.resources.availableRam}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</section>
+
+		<!-- Live Logs -->
+		<section class="monitoring-section">
+			<div class="section-header">
 				<h2 class="section-title">Live Logs</h2>
-				<div class="expand-btn" class:expanded={expandedSections.logs}>
-					{expandedSections.logs ? '−' : '+'}
-				</div>
-			</button>
-			<div class="header-actions">
-				<span class="log-stats">
+				<div class="header-stats">
 					<span class="stat-badge error">{logs.stats.errors}</span>
 					<span class="stat-badge warn">{logs.stats.warnings}</span>
-				</span>
-			</div>
-		</div>
-
-		{#if expandedSections.logs}
-			<div class="logs-container" transition:slide={{ duration: 300 }}>
-				<div class="log-controls">
-					<button class="clear-btn" on:click={clearLogs}>Clear</button>
-				</div>
-				<div class="log-entries">
-					{#each logs.entries.slice(-5) as entry (entry.timestamp + entry.message)}
-						<div class="log-entry">
-							<span class="log-time">{entry.timestamp}</span>
-							<span class="log-level" style="color: {getLogLevelColor(entry.level)}"
-								>{entry.level}</span
-							>
-							<span class="log-message">{entry.message}</span>
-						</div>
-					{/each}
+					<button
+						class="expand-btn"
+						class:expanded={expandedSections.logs}
+						on:click={() => toggleSection('logs')}
+						title={expandedSections.logs ? 'Show less' : 'Show more'}
+						aria-label={expandedSections.logs ? 'Collapse logs section' : 'Expand logs section'}
+					>
+						{expandedSections.logs ? '−' : '+'}
+					</button>
 				</div>
 			</div>
-		{/if}
-	</section>
 
-	<!-- Dependencies Health -->
-	<section class="monitoring-section">
-		<div class="section-header-wrapper">
-			<button
-				class="section-header clickable-header"
-				on:click={() => toggleSection('dependencies')}
-				title={expandedSections.dependencies ? 'Show less' : 'Show more'}
-			>
+			{#if expandedSections.logs}
+				<div class="logs-container" transition:slide={{ duration: 300 }}>
+					<div class="log-controls">
+						<button class="clear-btn" on:click={clearLogs} aria-label="Clear log entries">Clear</button>
+					</div>
+					<div class="log-entries">
+						{#each logs.entries.slice(-5) as entry (entry.timestamp + entry.message)}
+							<div class="log-entry">
+								<span class="log-time">{entry.timestamp}</span>
+								<span class="log-level" style="color: {getLogLevelColor(entry.level)}"
+									>{entry.level}</span
+								>
+								<span class="log-message">{entry.message}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</section>
+
+		<!-- Dependencies Health -->
+		<section class="monitoring-section">
+			<div class="section-header">
 				<h2 class="section-title">Dependencies</h2>
-				<div class="expand-btn" class:expanded={expandedSections.dependencies}>
-					{expandedSections.dependencies ? '−' : '+'}
-				</div>
-			</button>
-			<div class="header-actions">
-				<span class="dep-stats">
+				<div class="header-stats">
 					<span class="stat-badge warn">{dependencies.needsUpdate}</span>
 					<span class="stat-badge error">{dependencies.hasVulnerabilities}</span>
-				</span>
-			</div>
-		</div>
-
-		{#if expandedSections.dependencies}
-			<div class="dependencies-details" transition:slide={{ duration: 300 }}>
-				{#if dependencies.outdated.length > 0}
-					<div class="outdated-list">
-						<h4 class="subsection-title">Updates Available</h4>
-						{#each dependencies.outdated.slice(0, 3) as dep (dep.name)}
-							<div class="dep-item">
-								<span class="dep-name">{dep.name}</span>
-								<span class="dep-versions">{dep.current} → {dep.latest}</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-
-				{#if dependencies.vulnerabilities.length > 0}
-					<div class="vulnerabilities-list">
-						<h4 class="subsection-title">Security Issues</h4>
-						{#each dependencies.vulnerabilities as vuln (vuln.name)}
-							<div class="vuln-item">
-								<span class="vuln-name">{vuln.name}</span>
-								<span class="vuln-severity" style="color: {getSeverityColor(vuln.severity)}">
-									{vuln.severity}
-								</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-
-				<button class="action-btn" on:click={updateDependencies}> Update Dependencies </button>
-			</div>
-		{/if}
-	</section>
-
-	<!-- Performance (compact) -->
-	<section class="monitoring-section">
-		<button
-			class="section-header clickable-header"
-			on:click={() => toggleSection('performance')}
-			title={expandedSections.performance ? 'Show less' : 'Show more'}
-		>
-			<h2 class="section-title">Performance</h2>
-			<div class="expand-btn" class:expanded={expandedSections.performance}>
-				{expandedSections.performance ? '−' : '+'}
-			</div>
-		</button>
-
-		{#if expandedSections.performance}
-			<div class="performance-details" transition:slide={{ duration: 300 }}>
-				<div class="perf-grid">
-					<div class="perf-item">
-						<span class="perf-label">CPU:</span>
-						<span class="perf-value">{performance.system.cpu.toFixed(1)}%</span>
-					</div>
-					<div class="perf-item">
-						<span class="perf-label">Memory:</span>
-						<span class="perf-value">{performance.system.memory.toFixed(1)}%</span>
-					</div>
-					<div class="perf-item">
-						<span class="perf-label">Build Time:</span>
-						<span class="perf-value">{performance.app.buildTime}</span>
-					</div>
-					<div class="perf-item">
-						<span class="perf-label">Bundle Size:</span>
-						<span class="perf-value">{performance.app.bundleSize}</span>
-					</div>
+					<button
+						class="expand-btn"
+						class:expanded={expandedSections.dependencies}
+						on:click={() => toggleSection('dependencies')}
+						title={expandedSections.dependencies ? 'Show less' : 'Show more'}
+						aria-label={expandedSections.dependencies ? 'Collapse dependencies section' : 'Expand dependencies section'}
+					>
+						{expandedSections.dependencies ? '−' : '+'}
+					</button>
 				</div>
 			</div>
-		{/if}
-	</section>
+
+			{#if expandedSections.dependencies}
+				<div class="dependencies-details" transition:slide={{ duration: 300 }}>
+					{#if dependencies.outdated.length > 0}
+						<div class="outdated-list">
+							<h4 class="subsection-title">Updates Available</h4>
+							{#each dependencies.outdated.slice(0, 3) as dep (dep.name)}
+								<div class="dep-item">
+									<span class="dep-name">{dep.name}</span>
+									<span class="dep-versions">{dep.current} → {dep.latest}</span>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
+					{#if dependencies.vulnerabilities.length > 0}
+						<div class="vulnerabilities-list">
+							<h4 class="subsection-title">Security Issues</h4>
+							{#each dependencies.vulnerabilities as vuln (vuln.name)}
+								<div class="vuln-item">
+									<span class="vuln-name">{vuln.name}</span>
+									<span class="vuln-severity" style="color: {getSeverityColor(vuln.severity)}">
+										{vuln.severity}
+									</span>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
+					<button class="action-btn" on:click={updateDependencies} aria-label="Update dependencies"> Update Dependencies </button>
+				</div>
+			{/if}
+		</section>
+
+		<!-- Performance Metrics -->
+		<section class="monitoring-section">
+			<div class="section-header">
+				<h2 class="section-title">Performance</h2>
+				<button
+					class="expand-btn"
+					class:expanded={expandedSections.performance}
+					on:click={() => toggleSection('performance')}
+					title={expandedSections.performance ? 'Show less' : 'Show more'}
+					aria-label={expandedSections.performance ? 'Collapse performance section' : 'Expand performance section'}
+				>
+					{expandedSections.performance ? '−' : '+'}
+				</button>
+			</div>
+
+			{#if expandedSections.performance}
+				<div class="performance-details" transition:slide={{ duration: 300 }}>
+					<div class="perf-grid">
+						<div class="perf-item">
+							<span class="perf-label">CPU:</span>
+							<span class="perf-value">{performance.system.cpu.toFixed(1)}%</span>
+						</div>
+						<div class="perf-item">
+							<span class="perf-label">Memory:</span>
+							<span class="perf-value">{performance.system.memory.toFixed(1)}%</span>
+						</div>
+						<div class="perf-item">
+							<span class="perf-label">Build Time:</span>
+							<span class="perf-value">{performance.app.buildTime}</span>
+						</div>
+						<div class="perf-item">
+							<span class="perf-label">Bundle Size:</span>
+							<span class="perf-value">{performance.app.bundleSize}</span>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</section>
+	</div>
 </aside>
 
 <style>
@@ -567,9 +573,7 @@
 		border-radius: var(--radius-xl);
 		display: flex;
 		flex-direction: column;
-		overflow-y: auto;
-		padding: var(--spacing-lg);
-		gap: var(--spacing-lg);
+		overflow: hidden;
 		box-shadow: var(--glass-shadow-outer);
 		position: relative;
 	}
@@ -636,68 +640,17 @@
 	}
 
 	/* Section Headers - Enhanced */
-	.section-header-wrapper {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: var(--spacing-xs);
-		margin-bottom: var(--spacing-xs);
-	}
-
 	.section-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		width: 100%;
 		margin-bottom: var(--spacing-xs);
 	}
 
-	/* Clickable Header Button - Enhanced */
-	.clickable-header {
-		background: none;
-		border: 1px solid rgba(34, 197, 94, 0.3);
-		padding: 0;
-		cursor: pointer;
-		width: 100%;
+	.header-stats {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		transition: all var(--transition-smooth);
-		border-radius: var(--radius-sm);
-		text-align: left;
-		position: relative;
-		overflow: hidden;
-		box-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
-	}
-
-	.clickable-header::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-		opacity: 0;
-		transition: opacity var(--transition-smooth);
-	}
-
-	.clickable-header:hover {
-		background: rgba(255, 255, 255, 0.05);
-		padding: var(--spacing-xs) var(--spacing-sm);
-		margin: calc(-1 * var(--spacing-xs)) calc(-1 * var(--spacing-sm));
-		transform: translateY(-1px);
-		border-color: rgba(34, 197, 94, 0.5);
-		box-shadow: 0 0 16px rgba(34, 197, 94, 0.2);
-	}
-
-	.clickable-header:hover::before {
-		opacity: 1;
-	}
-
-	.clickable-header:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 2px;
+		gap: var(--spacing-xs);
 	}
 
 	.section-title {
@@ -707,15 +660,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		margin: 0;
-		pointer-events: none;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-	}
-
-	.header-actions {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-xs);
-		flex-shrink: 0;
 	}
 
 	.expand-btn {
@@ -733,12 +678,11 @@
 		font-weight: bold;
 		font-size: var(--font-size-sm);
 		flex-shrink: 0;
-		pointer-events: none;
 		box-shadow: var(--shadow-elevation-low);
 		cursor: pointer;
 	}
 
-	.clickable-header:hover .expand-btn {
+	.expand-btn:hover {
 		background: var(--glass-elevated-bg);
 		color: var(--color-text-primary);
 		transform: scale(1.1);
@@ -749,7 +693,7 @@
 		background: var(--color-interactive-primary);
 		color: var(--color-text-inverse);
 		border-color: var(--color-interactive-primary);
-		box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+		box-shadow: 0 0 12px rgba(22, 163, 74, 0.4);
 	}
 
 	/* Status Summary - Enhanced */
@@ -916,33 +860,6 @@
 	}
 
 	/* Logs */
-	.log-stats,
-	.dep-stats {
-		display: flex;
-		gap: 4px;
-	}
-
-	.stat-badge {
-		background: var(--color-surface-secondary);
-		color: var(--color-text-primary);
-		padding: 2px 6px;
-		border-radius: var(--radius-xs);
-		font-size: 10px;
-		font-weight: var(--font-weight-semibold);
-		min-width: 16px;
-		text-align: center;
-	}
-
-	.stat-badge.error {
-		background: var(--color-error);
-		color: var(--color-text-inverse);
-	}
-
-	.stat-badge.warn {
-		background: var(--color-warning);
-		color: var(--color-text-inverse);
-	}
-
 	.log-controls {
 		display: flex;
 		justify-content: flex-end;
@@ -950,17 +867,23 @@
 	}
 
 	.clear-btn {
-		background: var(--color-surface-secondary);
-		border: 1px solid rgba(34, 197, 94, 0.3);
-		border-radius: var(--radius-xs);
-		padding: 2px 8px;
-		font-size: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--spacing-sm);
+		background: var(--glass-secondary-bg);
+		backdrop-filter: blur(12px);
+		border: 1px solid var(--glass-border-primary);
+		border-radius: var(--radius-lg);
 		color: var(--color-text-secondary);
 		cursor: pointer;
 		transition: all var(--transition-smooth);
 		position: relative;
 		overflow: hidden;
-		box-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
+		box-shadow: var(--shadow-elevation-low);
+		min-height: 32px;
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.clear-btn::before {
@@ -976,10 +899,13 @@
 	}
 
 	.clear-btn:hover {
-		background: var(--color-surface-hover);
+		background: var(--glass-elevated-bg);
 		color: var(--color-text-primary);
-		border-color: rgba(34, 197, 94, 0.5);
-		box-shadow: 0 0 16px rgba(34, 197, 94, 0.2);
+		transform: translateY(-2px);
+		box-shadow:
+			var(--shadow-elevation-medium),
+			0 0 16px rgba(22, 163, 74, 0.15);
+		border-color: rgba(22, 163, 74, 0.4);
 	}
 
 	.clear-btn:hover::before {
@@ -1091,12 +1017,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--spacing-xs);
-		width: 100%;
 		padding: var(--spacing-md);
 		background: var(--glass-secondary-bg);
 		backdrop-filter: blur(12px);
-		border: 1px solid rgba(34, 197, 94, 0.3);
+		border: 1px solid rgba(22, 163, 74, 0.3);
 		border-radius: var(--radius-lg);
 		color: var(--color-text-secondary);
 		cursor: pointer;
@@ -1105,7 +1029,7 @@
 		overflow: hidden;
 		box-shadow:
 			var(--shadow-elevation-low),
-			0 0 8px rgba(34, 197, 94, 0.1);
+			0 0 8px rgba(22, 163, 74, 0.1);
 		min-height: 44px;
 		font-size: var(--font-size-sm);
 		font-weight: var(--font-weight-medium);
@@ -1129,11 +1053,109 @@
 		transform: translateY(-2px);
 		box-shadow:
 			var(--shadow-elevation-medium),
-			0 0 16px rgba(34, 197, 94, 0.2);
-		border-color: rgba(34, 197, 94, 0.5);
+			0 0 16px rgba(22, 163, 74, 0.2);
+		border-color: rgba(22, 163, 74, 0.5);
 	}
 
 	.action-btn:hover::before {
 		opacity: 1;
+	}
+
+	/* Add scrollable content area similar to other panels */
+	.monitoring-panel > * {
+		position: relative;
+		z-index: 3;
+	}
+
+	/* Make the main content scrollable */
+	.monitoring-panel {
+		height: 100%;
+		background: var(--glass-primary-bg);
+		backdrop-filter: blur(20px) saturate(140%) brightness(110%);
+		border: 1px solid var(--glass-border-primary);
+		border-radius: var(--radius-xl);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		box-shadow: var(--glass-shadow-outer);
+		position: relative;
+	}
+
+	/* Create a scrollable content wrapper */
+	.monitoring-panel .monitoring-section:first-child {
+		margin-top: var(--spacing-lg);
+	}
+
+	.monitoring-panel .monitoring-section:last-child {
+		margin-bottom: var(--spacing-lg);
+		border-bottom: none;
+		padding-bottom: var(--spacing-md);
+	}
+
+	/* Add internal scrolling container */
+	.monitoring-panel::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 40%;
+		background: var(--glass-gloss);
+		pointer-events: none;
+		z-index: 2;
+		border-radius: inherit;
+		opacity: 0.6;
+	}
+
+	/* Ensure sections container is scrollable */
+	.monitoring-panel {
+		padding: 0; /* Remove padding from main container */
+		gap: 0; /* Remove gap from main container */
+	}
+
+	/* Add scrollable wrapper */
+	.monitoring-content {
+		flex: 1;
+		overflow-y: auto;
+		padding: var(--spacing-lg);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-lg);
+		position: relative;
+		z-index: 3;
+	}
+
+	/* Logs */
+	.stat-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 20px;
+		height: 18px;
+		padding: 0 var(--spacing-xs);
+		border-radius: var(--radius-sm);
+		font-size: var(--font-size-xs);
+		font-weight: var(--font-weight-semibold);
+		background: var(--color-surface-secondary);
+		color: var(--color-text-secondary);
+		border: 1px solid var(--color-border-secondary);
+	}
+
+	.stat-badge.error {
+		background: var(--color-error-muted);
+		color: var(--color-error);
+		border-color: var(--color-error);
+	}
+
+	.stat-badge.warn {
+		background: var(--color-warning-muted);
+		color: var(--color-warning);
+		border-color: var(--color-warning);
+	}
+
+	.log-controls {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: var(--spacing-xs);
 	}
 </style>

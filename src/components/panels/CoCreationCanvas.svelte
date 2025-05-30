@@ -12,6 +12,7 @@
 		timestamp: Date;
 		type: 'text' | 'code' | 'file';
 		files?: UploadedFile[];
+		multicast: boolean;
 	}
 
 	interface UploadedFile {
@@ -31,14 +32,16 @@
 			content: "Welcome to Synapse Hub! I'm ready to help you with your development tasks.",
 			sender: 'cursor',
 			timestamp: new Date(Date.now() - 300000),
-			type: 'text'
+			type: 'text',
+			multicast: false
 		},
 		{
 			id: '2',
 			content: 'Can you help me create a responsive navigation component for my SvelteKit app?',
 			sender: 'user',
 			timestamp: new Date(Date.now() - 240000),
-			type: 'text'
+			type: 'text',
+			multicast: false
 		},
 		{
 			id: '3',
@@ -46,15 +49,16 @@
 				"I'll create a responsive navigation component for you. Here's a modern implementation with semantic HTML, mobile-friendly design, and accessibility features. The component will include a collapsible menu for mobile devices and clean styling that works across all screen sizes.",
 			sender: 'cursor',
 			timestamp: new Date(Date.now() - 180000),
-			type: 'text'
+			type: 'text',
+			multicast: false
 		}
 	];
 
 	// Scroll behavior
 	let messagesContainer: HTMLElement;
 
-	// AI Agent state
-	let selectedAgent: 'cursor' | 'gemini' = 'cursor';
+	// AI Agent state - Updated for multi-selection
+	let selectedAgents: Set<'cursor' | 'gemini'> = new Set(['cursor']);
 	let cursorActive = true;
 	let geminiActive = false;
 
@@ -216,9 +220,14 @@
 		}
 	}
 
-	function selectAgent(agent: typeof selectedAgent) {
-		selectedAgent = agent;
-		dispatch('agentSelected', { agent });
+	function selectAgent(agent: 'cursor' | 'gemini') {
+		if (selectedAgents.has(agent)) {
+			selectedAgents.delete(agent);
+		} else {
+			selectedAgents.add(agent);
+		}
+		selectedAgents = selectedAgents; // Trigger reactivity
+		dispatch('agentSelected', { agents: Array.from(selectedAgents) });
 	}
 
 	function toggleA2A() {
@@ -237,6 +246,11 @@
 	}
 
 	function sendMessage() {
+		if (selectedAgents.size === 0) {
+			// Don't send if no agents selected
+			return;
+		}
+
 		if (messageText.trim() || uploadedFiles.length > 0) {
 			// Add message to conversation
 			const newMessage = {
@@ -245,7 +259,8 @@
 				sender: 'user' as const,
 				timestamp: new Date(),
 				type: uploadedFiles.length > 0 ? ('file' as const) : ('text' as const),
-				files: uploadedFiles.length > 0 ? [...uploadedFiles] : undefined
+				files: uploadedFiles.length > 0 ? [...uploadedFiles] : undefined,
+				multicast: selectedAgents.size > 1
 			};
 
 			messages = [...messages, newMessage];
@@ -261,7 +276,7 @@
 			forceScrollToBottom();
 			setTimeout(forceScrollToBottom, 100);
 
-			dispatch('messagesSent', { message: newMessage, agent: selectedAgent });
+			dispatch('messagesSent', { message: newMessage, agents: Array.from(selectedAgents) });
 		}
 	}
 
@@ -512,6 +527,12 @@
 							</time>
 						</div>
 					</div>
+					{#if message.multicast && message.sender === 'user'}
+						<div class="multicast-indicator">
+							<span class="multicast-icon">📡</span>
+							<span class="multicast-text">Sent to multiple AIs</span>
+						</div>
+					{/if}
 				</header>
 
 				<!-- Message Content -->
@@ -552,41 +573,60 @@
 	<div class="message-input-area">
 		<!-- AI Agent Selection -->
 		<div class="agent-selector">
-			<span class="agent-label">AI Assistant:</span>
-			<div class="agent-buttons">
-				<button
-					class="agent-btn button-3d"
-					class:active={selectedAgent === 'cursor'}
-					on:click={() => selectAgent('cursor')}
-				>
-					<div class="agent-indicator cursor" class:active={cursorActive}></div>
-					<span>Cursor</span>
-				</button>
+			<div class="agent-selector-main">
+				<span class="agent-label">AI Assistant:</span>
+				<div class="agent-buttons">
+					<button
+						class="agent-btn button-3d"
+						class:active={selectedAgents.has('cursor')}
+						on:click={() => selectAgent('cursor')}
+					>
+						<div class="agent-indicator cursor" class:active={selectedAgents.has('cursor')}></div>
+						<span>Cursor</span>
+					</button>
 
-				<button
-					class="agent-btn button-3d"
-					class:active={selectedAgent === 'gemini'}
-					on:click={() => selectAgent('gemini')}
-				>
-					<div class="agent-indicator gemini" class:active={geminiActive}></div>
-					<span>Gemini</span>
-				</button>
-			</div>
+					<button
+						class="agent-btn button-3d"
+						class:active={selectedAgents.has('gemini')}
+						on:click={() => selectAgent('gemini')}
+					>
+						<div class="agent-indicator gemini" class:active={selectedAgents.has('gemini')}></div>
+						<span>Gemini</span>
+					</button>
+				</div>
 
-			<!-- A2A Collaboration Toggle -->
-			<div class="a2a-control">
-				<span class="a2a-label">A2A</span>
-				<button
-					class="toggle-switch"
-					class:active={a2aEnabled}
-					on:click={toggleA2A}
-					title="Agent-to-Agent Collaboration"
-					aria-label="Toggle Agent-to-Agent Collaboration"
-				>
-					<div class="toggle-track">
-						<div class="toggle-thumb"></div>
+				<!-- A2A Collaboration Toggle -->
+				<div class="a2a-control">
+					<span class="a2a-label">A2A</span>
+					<button
+						class="toggle-switch"
+						class:active={a2aEnabled}
+						on:click={toggleA2A}
+						title="Agent-to-Agent Collaboration"
+						aria-label="Toggle Agent-to-Agent Collaboration"
+					>
+						<div class="toggle-track">
+							<div class="toggle-thumb"></div>
+						</div>
+					</button>
+				</div>
+
+				<!-- Multi-Agent Status & Cost Warning - Positioned to not affect main layout -->
+				{#if selectedAgents.size > 1}
+					<div class="multi-agent-status">
+						<div class="cost-warning">
+							<span class="warning-icon">💡</span>
+							<span class="warning-text">Sending to {selectedAgents.size} AIs will use {selectedAgents.size}x API credits</span>
+						</div>
 					</div>
-				</button>
+				{:else if selectedAgents.size === 0}
+					<div class="multi-agent-status">
+						<div class="no-agent-warning">
+							<span class="warning-icon">⚠️</span>
+							<span class="warning-text">Select at least one AI to send messages</span>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 
@@ -689,12 +729,20 @@
 				</button>
 			{/if}
 
+			<!-- Send Button -->
 			<button
 				class="send-button button-3d"
 				on:click={sendMessage}
-				disabled={!messageText.trim() && uploadedFiles.length === 0}
+				disabled={(!messageText.trim() && uploadedFiles.length === 0) || selectedAgents.size === 0}
+				aria-label="Send message"
 			>
-				Send
+				{#if selectedAgents.size > 1}
+					Send to {selectedAgents.size} AIs
+				{:else if selectedAgents.size === 1}
+					Send
+				{:else}
+					Select AI
+				{/if}
 			</button>
 		</div>
 	</div>
@@ -813,13 +861,38 @@
 
 	/* Message Header */
 	.message-header {
-		margin-bottom: var(--spacing-xs);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: var(--spacing-sm);
+		padding-bottom: var(--spacing-xs);
+		border-bottom: 1px solid var(--color-border-muted);
 	}
 
 	.sender-info {
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-sm);
+	}
+
+	.multicast-indicator {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+		background: var(--color-surface-secondary);
+		border: 1px solid var(--color-border-primary);
+		border-radius: var(--radius-sm);
+		padding: var(--spacing-xs) var(--spacing-sm);
+	}
+
+	.multicast-icon {
+		font-size: var(--font-size-sm);
+	}
+
+	.multicast-text {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.sender-avatar {
@@ -1107,7 +1180,7 @@
 	}
 
 	.send-button {
-		min-width: 80px;
+		min-width: 140px; /* Fixed width to accommodate longer text */
 		min-height: 44px;
 		padding: var(--spacing-md);
 		background: var(--glass-secondary-bg);
@@ -1167,8 +1240,15 @@
 	/* AI Agent Selection */
 	.agent-selector {
 		display: flex;
+		flex-direction: column;
+	}
+
+	.agent-selector-main {
+		display: flex;
 		align-items: center;
 		gap: var(--spacing-md);
+		min-height: 40px; /* Fixed height to prevent shifting */
+		position: relative; /* For absolute positioning of warning */
 	}
 
 	.agent-label {
@@ -1195,37 +1275,77 @@
 		font-size: var(--font-size-sm);
 		cursor: pointer;
 		transition: all var(--transition-smooth);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.agent-btn::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+		opacity: 0;
+		transition: opacity var(--transition-smooth);
 	}
 
 	.agent-btn:hover {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-elevation-medium);
+	}
+
+	.agent-btn:hover::before {
+		opacity: 1;
 	}
 
 	.agent-btn.active {
 		background: var(--color-surface-primary);
 		color: var(--color-text-primary);
-		border-color: var(--color-interactive-primary);
-		border-width: 2px;
-		box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+		border: 2px solid var(--color-interactive-primary); /* Single border declaration */
+		box-shadow: 0 0 8px rgba(22, 163, 74, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.agent-btn.active::before {
+		opacity: 1;
 	}
 
 	.agent-indicator {
-		width: 6px;
-		height: 6px;
+		width: 8px;
+		height: 8px;
 		border-radius: 50%;
 		background: var(--color-border-secondary);
 		transition: all var(--transition-smooth);
+		position: relative;
+	}
+
+	.agent-indicator.active {
+		transform: scale(1.2);
 	}
 
 	.agent-indicator.cursor.active {
 		background: var(--color-agent-cursor);
-		box-shadow: 0 0 6px var(--color-agent-cursor);
+		box-shadow: 0 0 8px var(--color-agent-cursor);
+		animation: subtle-pulse 2s ease-in-out infinite;
 	}
 
 	.agent-indicator.gemini.active {
 		background: var(--color-agent-gemini);
-		box-shadow: 0 0 6px var(--color-agent-gemini);
+		box-shadow: 0 0 8px var(--color-agent-gemini);
+		animation: subtle-pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes subtle-pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.7;
+		}
 	}
 
 	/* A2A Collaboration Toggle */
@@ -1319,5 +1439,40 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	/* Multi-Agent Status & Cost Warning - Positioned to not affect main layout */
+	.multi-agent-status {
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		flex-shrink: 0;
+	}
+
+	.cost-warning,
+	.no-agent-warning {
+		background: var(--color-surface-tertiary);
+		border: 1px solid var(--color-border-secondary);
+		border-radius: var(--radius-sm);
+		padding: var(--spacing-xs) var(--spacing-sm);
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+		font-size: var(--font-size-xs);
+		white-space: nowrap;
+		box-shadow: var(--shadow-elevation-low);
+	}
+
+	.warning-icon {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-primary);
+		flex-shrink: 0;
+	}
+
+	.warning-text {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-primary);
+		line-height: 1.2;
 	}
 </style>

@@ -176,6 +176,7 @@
 			on:messageAction={handleMessageAction}
 			on:createFocusZone={handleCreateFocusZone}
 			on:startThread={handleStartThread}
+			on:a2aToggle={handleA2AToggle}
 			on:focus={() => adjustPanelWidths('canvas')}
 		/>
 
@@ -253,6 +254,7 @@
 				on:messageAction={handleMessageAction}
 				on:createFocusZone={handleCreateFocusZone}
 				on:startThread={handleStartThread}
+				on:a2aToggle={handleA2AToggle}
 			/>
 		</main>
 
@@ -302,12 +304,23 @@
 	.desktop-tablet-layout {
 		display: grid;
 		grid-template-columns: 1fr 2fr 1fr;
+		grid-template-rows: 1fr;
 		gap: var(--spacing-md);
 		padding: var(--spacing-lg);
 		background: var(--color-background-primary);
 		height: 100vh;
 		overflow: hidden;
 		position: relative;
+		align-items: stretch; /* Ensure all panels stretch to full height */
+	}
+
+	/* Ensure all direct children (panels) have consistent alignment */
+	.desktop-tablet-layout > :global(*) {
+		transition: all var(--transition-smooth);
+		z-index: 1;
+		position: relative;
+		height: 100%; /* Ensure all panels take full available height */
+		align-self: stretch; /* Force panels to stretch vertically */
 	}
 
 	/* Add glass morphism background to the entire layout */

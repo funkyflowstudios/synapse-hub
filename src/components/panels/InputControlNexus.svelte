@@ -855,30 +855,6 @@
 		padding: var(--spacing-md);
 		background: var(--glass-secondary-bg);
 		backdrop-filter: blur(12px);
-		border: 1px solid rgba(34, 197, 94, 0.3);
-		border-radius: var(--radius-lg);
-		color: var(--color-text-secondary);
-		cursor: pointer;
-		transition: all var(--transition-smooth);
-		position: relative;
-		overflow: hidden;
-		box-shadow:
-			var(--shadow-elevation-low),
-			0 0 8px rgba(34, 197, 94, 0.1);
-		min-height: 44px;
-		font-size: var(--font-size-sm);
-		font-weight: var(--font-weight-medium);
-	}
-
-	/* Buttons without activation functions (search-btn, platform-btn excluded) */
-	.search-btn,
-	.platform-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: var(--spacing-md);
-		background: var(--glass-secondary-bg);
-		backdrop-filter: blur(12px);
 		border: 1px solid var(--glass-border-primary);
 		border-radius: var(--radius-lg);
 		color: var(--color-text-secondary);
@@ -892,7 +868,7 @@
 		font-weight: var(--font-weight-medium);
 	}
 
-	/* Hover effects for buttons with subtle green hue */
+	/* Hover effects for regular buttons without green accent */
 	.action-btn:hover,
 	.knowledge-btn-compact:hover,
 	.browse-knowledge-btn:hover,
@@ -901,30 +877,33 @@
 		background: var(--glass-elevated-bg);
 		color: var(--color-text-primary);
 		transform: translateY(-2px);
-		box-shadow:
-			var(--shadow-elevation-medium),
-			0 0 16px rgba(34, 197, 94, 0.2);
-		border-color: rgba(34, 197, 94, 0.5);
-	}
-
-	/* Hover effects for buttons without green hue */
-	.search-btn:hover,
-	.platform-btn:hover {
-		background: var(--glass-elevated-bg);
-		color: var(--color-text-primary);
-		transform: translateY(-2px);
 		box-shadow: var(--shadow-elevation-medium);
 		border-color: var(--glass-border-highlight);
 	}
 
-	/* Gradient overlay effect for ALL buttons */
-	.action-btn::before,
-	.search-btn::before,
-	.platform-btn::before,
-	.knowledge-btn-compact::before,
-	.browse-knowledge-btn::before,
-	.resource-action-btn::before,
-	.category-action-btn::before {
+	/* Search button to exactly match send button styling */
+	.search-btn {
+		background: var(--glass-secondary-bg);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(34, 197, 94, 0.3);
+		border-radius: var(--radius-lg);
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
+		cursor: pointer;
+		transition: all var(--transition-smooth);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		position: relative;
+		overflow: hidden;
+		box-shadow: var(--shadow-elevation-low), 0 0 8px rgba(34, 197, 94, 0.1);
+		min-height: 44px;
+		padding: var(--spacing-md);
+	}
+
+	.search-btn::before {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -936,47 +915,84 @@
 		transition: opacity var(--transition-smooth);
 	}
 
-	.action-btn:hover::before,
-	.search-btn:hover::before,
-	.platform-btn:hover::before,
-	.knowledge-btn-compact:hover::before,
-	.browse-knowledge-btn:hover::before,
-	.resource-action-btn:hover::before,
-	.category-action-btn:hover::before {
+	.search-btn:hover:not(:disabled) {
+		background: var(--glass-elevated-bg);
+		color: var(--color-text-primary);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-elevation-medium), 0 0 16px rgba(34, 197, 94, 0.2);
+		border-color: rgba(34, 197, 94, 0.5);
+	}
+
+	.search-btn:hover:not(:disabled)::before {
 		opacity: 1;
-	}
-
-	/* Special styling only for primary action buttons */
-	.search-btn {
-		background: var(--color-interactive-primary);
-		color: var(--color-text-inverse);
-		border-color: var(--color-interactive-primary);
-	}
-
-	.search-btn:hover {
-		background: var(--color-interactive-primary-hover);
-		color: var(--color-text-inverse);
 	}
 
 	.search-btn:disabled {
 		background: var(--color-border-secondary);
-		color: var(--color-text-secondary);
+		color: var(--color-text-quaternary);
 		cursor: not-allowed;
 		transform: none;
 		box-shadow: var(--shadow-elevation-low);
 	}
 
-	/* Active state for toggle buttons */
+	/* Platform buttons to match AI selector exactly */
+	.platform-btn {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+		padding: var(--spacing-sm) var(--spacing-md);
+		background: var(--color-surface-primary);
+		border: 1px solid var(--color-border-primary);
+		border-radius: var(--radius-sm);
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+		cursor: pointer;
+		transition: all var(--transition-smooth);
+		position: relative;
+		overflow: hidden;
+		flex: 1;
+	}
+
+	.platform-btn::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+		opacity: 0;
+		transition: opacity var(--transition-smooth);
+	}
+
+	.platform-btn:hover {
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-elevation-medium);
+	}
+
+	.platform-btn:hover::before {
+		opacity: 1;
+	}
+
 	.platform-btn.active {
-		background: var(--color-interactive-primary);
-		color: var(--color-text-inverse);
+		background: var(--color-surface-primary);
+		color: var(--color-text-primary);
 		border-color: var(--color-interactive-primary);
-		box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+		border-width: 2px;
+		box-shadow: 0 0 8px rgba(22, 163, 74, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.platform-btn.active::before {
+		opacity: 1;
 	}
 
 	.platform-btn.active:hover {
-		background: var(--color-interactive-primary-hover);
-		color: var(--color-text-inverse);
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
+		border-color: var(--color-interactive-primary);
 	}
 
 	/* Smaller buttons for compact areas */
@@ -995,8 +1011,10 @@
 	}
 
 	/* Platform selector specific styling */
-	.platform-btn {
-		flex: 1;
+	.platform-selector {
+		display: flex;
+		gap: var(--spacing-xs);
+		margin-top: var(--spacing-sm);
 	}
 
 	.action-label,
@@ -1033,13 +1051,6 @@
 
 	.api-input:focus {
 		border-color: var(--color-border-focus);
-	}
-
-	/* Platform Selector */
-	.platform-selector {
-		display: flex;
-		gap: var(--spacing-xs);
-		margin-top: var(--spacing-sm);
 	}
 
 	/* Knowledge Base */
@@ -1546,5 +1557,38 @@
 	.browse-knowledge-btn {
 		width: 100%;
 		gap: var(--spacing-xs);
+	}
+
+	/* Gradient overlay effect for buttons */
+	.action-btn::before,
+	.search-btn::before,
+	.platform-btn::before,
+	.knowledge-btn-compact::before,
+	.browse-knowledge-btn::before,
+	.resource-action-btn::before,
+	.category-action-btn::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+		opacity: 0;
+		transition: opacity var(--transition-smooth);
+	}
+
+	.action-btn:hover::before,
+	.search-btn:hover::before,
+	.platform-btn:hover::before,
+	.knowledge-btn-compact:hover::before,
+	.browse-knowledge-btn:hover::before,
+	.resource-action-btn:hover::before,
+	.category-action-btn:hover::before {
+		opacity: 1;
+	}
+
+	.platform-btn.active::before {
+		opacity: 1;
 	}
 </style>

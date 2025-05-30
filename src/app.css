@@ -225,12 +225,12 @@
 	--color-border-error: #ef4444;
 
 	/* Interactive elements - vibrant green/teal theme matching image */
-	--color-interactive-primary: #22c55e;
-	--color-interactive-primary-hover: #34d399;
-	--color-interactive-primary-pressed: #16a34a;
-	--color-interactive-secondary: #14b8a6;
-	--color-interactive-secondary-hover: #20d9d0;
-	--color-interactive-accent: #06d6a0;
+	--color-interactive-primary: #16a34a;
+	--color-interactive-primary-hover: #22c55e;
+	--color-interactive-primary-pressed: #15803d;
+	--color-interactive-secondary: #0f766e;
+	--color-interactive-secondary-hover: #14b8a6;
+	--color-interactive-accent: #059669;
 	--color-interactive-muted: #737373;
 
 	/* Status colors with sophisticated opacity */

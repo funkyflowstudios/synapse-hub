@@ -148,10 +148,12 @@ src/
 ### CoCreationCanvas (Center Panel)
 
 - **Conversation Stream**: Real-time AI conversation display
+- **Multi-Agent Selection**: Choose between Cursor and/or Gemini AI simultaneously
 - **Message Management**: Rich message formatting and file attachments
 - **Agent Collaboration**: Visual indicators for A2A communication
 - **Voice Input**: Speech-to-text with visual feedback
 - **File Processing**: Smart file preview and content recognition
+- **Cost Awareness**: API credit usage warnings for multi-agent conversations
 
 ### OrchestrationForesightDeck (Right Panel)
 
@@ -199,13 +201,16 @@ src/
 
 ### Button System
 
-All buttons follow a unified design pattern:
+All buttons follow a unified design pattern with enhanced consistency:
 
-- **Glass Morphism**: Subtle backdrop-filter effects
-- **Green Hue Accents**: Consistent `rgba(34, 197, 94, 0.3)` border treatment
-- **Hover States**: Transform and shadow elevation changes
+- **Glass Morphism**: Subtle backdrop-filter effects with sophisticated depth
+- **Green Hue Accents**: Consistent `rgba(34, 197, 94, 0.3)` border treatment for action buttons
+- **Neutral Base**: Clean glass styling for regular buttons without distracting colors
+- **Active States**: Green accents reserved for selected/active states and primary actions
+- **Hover States**: Transform and shadow elevation changes with gradient overlays
 - **Focus Management**: Visible focus indicators for accessibility
 - **Size Consistency**: Minimum 44px height for touch accessibility
+- **Layout Stability**: Fixed dimensions prevent UI shifting during state changes
 
 ### Color Palette
 
