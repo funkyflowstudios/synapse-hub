@@ -49,7 +49,7 @@ describe('MainLayoutShell', () => {
 		expect(screen.getByRole('application')).toBeInTheDocument();
 		expect(screen.getByText('Synapse Hub')).toBeInTheDocument();
 		expect(screen.getByPlaceholderText('Ask anything...')).toBeInTheDocument();
-		
+
 		// Check for quick action pills
 		expect(screen.getByText('Ask Cursor')).toBeInTheDocument();
 		expect(screen.getByText('Ask Gemini')).toBeInTheDocument();
@@ -69,10 +69,10 @@ describe('MainLayoutShell', () => {
 		// Check for semantic elements in mobile layout
 		const headers = screen.getAllByRole('banner'); // Multiple headers expected
 		expect(headers.length).toBeGreaterThan(0);
-		
+
 		const mains = screen.getAllByRole('main'); // Multiple main elements expected
 		expect(mains.length).toBeGreaterThan(0);
-		
+
 		expect(screen.getByRole('contentinfo')).toBeInTheDocument(); // footer
 	});
 
@@ -81,7 +81,7 @@ describe('MainLayoutShell', () => {
 
 		// All interactive elements should be focusable (buttons don't have tabindex by default, which is correct)
 		const buttons = screen.getAllByRole('button');
-		buttons.forEach(button => {
+		buttons.forEach((button) => {
 			// Buttons should not have tabindex="-1" (which would make them unfocusable)
 			expect(button).not.toHaveAttribute('tabindex', '-1');
 		});
@@ -91,7 +91,7 @@ describe('MainLayoutShell', () => {
 		// Mock prefers-reduced-motion
 		Object.defineProperty(window, 'matchMedia', {
 			writable: true,
-			value: vi.fn().mockImplementation(query => ({
+			value: vi.fn().mockImplementation((query) => ({
 				matches: query === '(prefers-reduced-motion: reduce)',
 				media: query,
 				onchange: null,
@@ -99,8 +99,8 @@ describe('MainLayoutShell', () => {
 				removeListener: vi.fn(),
 				addEventListener: vi.fn(),
 				removeEventListener: vi.fn(),
-				dispatchEvent: vi.fn(),
-			})),
+				dispatchEvent: vi.fn()
+			}))
 		});
 
 		render(MainLayoutShell);
@@ -113,7 +113,7 @@ describe('MainLayoutShell', () => {
 		// Mock high contrast mode
 		Object.defineProperty(window, 'matchMedia', {
 			writable: true,
-			value: vi.fn().mockImplementation(query => ({
+			value: vi.fn().mockImplementation((query) => ({
 				matches: query === '(prefers-contrast: high)',
 				media: query,
 				onchange: null,
@@ -121,8 +121,8 @@ describe('MainLayoutShell', () => {
 				removeListener: vi.fn(),
 				addEventListener: vi.fn(),
 				removeEventListener: vi.fn(),
-				dispatchEvent: vi.fn(),
-			})),
+				dispatchEvent: vi.fn()
+			}))
 		});
 
 		render(MainLayoutShell);
@@ -133,19 +133,19 @@ describe('MainLayoutShell', () => {
 		// Test desktop layout
 		window.innerWidth = 1200;
 		const { unmount } = render(MainLayoutShell);
-		
+
 		// In desktop mode, master panel should be visible with 20% width
 		const masterPanel = screen.getByLabelText('Master Control Panel');
 		expect(masterPanel).toHaveStyle({ width: '20%' });
-		
+
 		unmount();
-		
+
 		// Test tablet layout
 		window.innerWidth = 900;
 		render(MainLayoutShell);
-		
+
 		// In tablet mode, master panel should be visible with 30% width
 		const tabletMasterPanel = screen.getByLabelText('Master Control Panel');
 		expect(tabletMasterPanel).toHaveStyle({ width: '30%' });
 	});
-}); 
+});

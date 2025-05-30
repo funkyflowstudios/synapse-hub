@@ -6,13 +6,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script>
 			// Immediately apply theme from localStorage to prevent flash
-			(function() {
+			(function () {
 				try {
 					const savedTheme = localStorage.getItem('synapse-theme');
 					const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-					
+
 					let themeToApply = 'light'; // default
-					
+
 					if (savedTheme) {
 						if (savedTheme === 'auto') {
 							themeToApply = systemPrefersDark ? 'dark' : 'light';
@@ -23,7 +23,7 @@
 						// No saved theme, use system preference
 						themeToApply = systemPrefersDark ? 'dark' : 'light';
 					}
-					
+
 					document.documentElement.setAttribute('data-theme', themeToApply);
 				} catch (e) {
 					// Fallback to light theme if anything fails
