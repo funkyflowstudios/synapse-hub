@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
 
 /* ==========================================================================
    Synapse Hub - Visual Philosophy: "Sophisticated Minimalism & Tactile Realism"
@@ -187,14 +185,12 @@
 	--ambient-warmth: 1;
 	--ambient-brightness: 1;
 	--time-of-day-factor: 1;
-}
 
-/* ==========================================================================
-   Core Theme: Deep Dark (Primary) - Immersive & Focused Workspace
-   Shades of charcoal, obsidian with subtle cool undertones - Updated for Image Design
-   ========================================================================== */
+	/* ==========================================================================
+     Core Theme: Deep Dark (Primary) - Immersive & Focused Workspace
+     Shades of charcoal, obsidian with subtle cool undertones - Updated for Image Design
+     ========================================================================== */
 
-:root {
 	/* Deep Dark Theme - Primary workspace environment - Enhanced for image design */
 	--color-background-primary: #0a0a0a;
 	--color-background-secondary: #111111;
