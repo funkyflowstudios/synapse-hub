@@ -1,59 +1,126 @@
-test-results
-node_modules
-
-# Output
+# Build outputs
 .output
 .vercel
 .netlify
 .wrangler
 /.svelte-kit
 /build
+dist
+dist-ssr
 
-# OS
-.DS_Store
-Thumbs.db
+# Dependencies
+node_modules/
+jspm_packages/
+bower_components
 
-# Env
+# Test artifacts
+test-results/
+coverage/
+.nyc_output
+*.lcov
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*storybook.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
 .env
 .env.*
 !.env.example
 !.env.test
 
+# Cache directories
+.cache
+.parcel-cache
+.npm
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# SQLite databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Storybook
+storybook-static
+.out
+.storybook-out
+
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+*.local
 
-# SQLite
-*.db
-
-# Paraglide
-src/lib/paraglide
+# Paraglide (i18n)
+src/lib/paraglide/
 project.inlang/cache/
 project.inlang/project_id
 
-*storybook.log
-storybook-static
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+tmp/
+temp/
+
+# Output of package managers
+*.tgz
+.yarn-integrity
+.node_repl_history
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-*
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
 
 # Development-specific files (should not be in public repo)
 .cursor/
-*.log
-*.pid
-*.seed
-*.pid.lock
-
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Other development artifacts
-coverage/
-.nyc_output
-.cache
-
-# Design documents and sensitive project files
 Synapse_Hub_UI_Design.md
 *.design.md
 docs/internal/
