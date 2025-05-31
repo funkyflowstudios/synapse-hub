@@ -56,7 +56,7 @@ async def create_task(
     - **ai_contexts**: Optional AI context data
     """
     task = await task_service.create_task(task_data, current_user)
-    return TaskResponse.from_orm(task)
+    return TaskResponse.from_task(task)
 
 
 @router.get(
@@ -126,7 +126,7 @@ async def list_tasks(
     )
     
     # Convert to response format
-    task_responses = [TaskResponse.from_orm(task) for task in result["tasks"]]
+    task_responses = [TaskResponse.from_task(task) for task in result["tasks"]]
     
     return TaskListResponse(
         tasks=task_responses,
@@ -166,8 +166,8 @@ async def get_task(
     if not task:
         from app.core.exceptions import NotFoundError
         raise NotFoundError(f"Task with ID {task_id} not found")
-    
-    return TaskResponse.from_orm(task)
+
+    return TaskResponse.from_task(task)
 
 
 @router.put(
@@ -202,7 +202,7 @@ async def update_task(
     - AI contexts
     """
     task = await task_service.update_task(task_id, task_data, current_user)
-    return TaskResponse.from_orm(task)
+    return TaskResponse.from_task(task)
 
 
 @router.delete(
@@ -262,7 +262,7 @@ async def start_task(
     and sets the started_at timestamp.
     """
     task = await task_service.start_task(task_id, current_user)
-    return TaskResponse.from_orm(task)
+    return TaskResponse.from_task(task)
 
 
 @router.post(
@@ -286,7 +286,7 @@ async def complete_task(
     Sets the completed_at timestamp and calculates actual duration.
     """
     task = await task_service.complete_task(task_id, current_user)
-    return TaskResponse.from_orm(task)
+    return TaskResponse.from_task(task)
 
 
 @router.post(
@@ -311,7 +311,7 @@ async def fail_task(
     Records the error message and sets completion timestamp.
     """
     task = await task_service.fail_task(task_id, error_message, current_user)
-    return TaskResponse.from_orm(task)
+    return TaskResponse.from_task(task)
 
 
 @router.post(
@@ -337,4 +337,4 @@ async def retry_task(
     - Retry count is less than max_retries
     """
     task = await task_service.retry_task(task_id, current_user)
-    return TaskResponse.from_orm(task) 
+    return TaskResponse.from_task(task) 

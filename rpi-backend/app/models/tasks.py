@@ -304,7 +304,7 @@ class TaskUpdate(PydanticModel):
 
 class TaskResponse(PydanticModel):
     """Schema for task API responses."""
-    id: str
+    id: str  # Will be populated from task_id
     title: str
     description: Optional[str]
     status: TaskStatus
@@ -325,8 +325,33 @@ class TaskResponse(PydanticModel):
     updated_at: datetime
     created_by: Optional[str]
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
+    
+    @classmethod
+    def from_task(cls, task: "Task") -> "TaskResponse":
+        """Create TaskResponse from Task model."""
+        return cls(
+            id=str(task.id),  # Convert UUID to string
+            title=task.title,
+            description=task.description,
+            status=task.status,
+            current_turn=task.current_turn,
+            priority=task.priority,
+            progress=task.progress,
+            project_path=task.project_path,
+            ssh_host=task.ssh_host,
+            ssh_user=task.ssh_user,
+            started_at=task.started_at,
+            completed_at=task.completed_at,
+            estimated_duration=task.estimated_duration,
+            actual_duration=task.actual_duration,
+            error_message=task.error_message,
+            retry_count=task.retry_count,
+            max_retries=task.max_retries,
+            created_at=task.created_at,
+            updated_at=task.updated_at,
+            created_by=task.created_by,
+        )
 
 
 class TaskListResponse(PydanticModel):

@@ -187,6 +187,12 @@ async def get_db_session_context():
     Yields:
         AsyncSession: Database session
     """
+    if not async_session_maker:
+        raise DatabaseError(
+            "Database not initialized. Call init_database() first.",
+            operation="get_db_session_context"
+        )
+        
     session = async_session_maker()
     try:
         yield session
@@ -206,6 +212,10 @@ async def health_check() -> bool:
     Returns:
         bool: True if database is healthy, False otherwise
     """
+    if not async_session_maker:
+        logger.error("Database health check failed: async_session_maker is None")
+        return False
+        
     try:
         async with get_db_session_context() as session:
             # Simple query to test connectivity

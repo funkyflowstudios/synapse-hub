@@ -128,36 +128,118 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["health"])
     async def health_check_endpoint():
         """
-        Health check endpoint for monitoring.
+        Comprehensive health check endpoint for monitoring.
         
         Returns:
-            dict: Health status information
+            dict: Complete health status information for all services
         """
         try:
-            # Check database health
-            db_healthy = await health_check()
+            from app.core.health import health_manager
             
-            # TODO: Check AI services health
-            # TODO: Check WebSocket health
-            # TODO: Check Cursor Connector health
+            # Perform comprehensive health check
+            health_report = await health_manager.perform_comprehensive_health_check()
             
-            status = "healthy" if db_healthy else "unhealthy"
+            # Return health report with appropriate HTTP status
+            if health_report["status"] == "unhealthy":
+                raise HTTPException(
+                    status_code=503, 
+                    detail={
+                        "message": "Service unhealthy",
+                        "health_report": health_report
+                    }
+                )
+            elif health_report["status"] == "degraded":
+                # Return 200 but indicate degraded performance
+                return {**health_report, "warning": "Some services are degraded"}
+            else:
+                return health_report
+            
+        except HTTPException:
+            raise  # Re-raise HTTP exceptions as-is
+        except Exception as e:
+            logger.error(f"Health check failed: {str(e)}")
+            raise HTTPException(
+                status_code=503, 
+                detail={
+                    "message": "Health check system failure",
+                    "error": str(e),
+                    "status": "unhealthy"
+                }
+            )
+    
+    # Detailed health endpoints
+    @app.get("/health/services/{service_name}", tags=["health"])
+    async def get_service_health(service_name: str):
+        """
+        Get health information for a specific service.
+        
+        Args:
+            service_name: Name of the service to check
+            
+        Returns:
+            dict: Service-specific health information
+        """
+        from app.core.health import health_manager
+        
+        try:
+            # Perform service-specific health check
+            service_methods = {
+                "database": health_manager.check_database_health,
+                "gemini": health_manager.check_gemini_health,
+                "cursor": health_manager.check_cursor_health,
+                "websocket": health_manager.check_websocket_health,
+                "system": health_manager.check_system_resources
+            }
+            
+            if service_name not in service_methods:
+                raise HTTPException(
+                    status_code=404, 
+                    detail=f"Service '{service_name}' not found. Available services: {list(service_methods.keys())}"
+                )
+            
+            result = await service_methods[service_name]()
             
             return {
-                "status": status,
-                "version": settings.version,
-                "environment": settings.environment,
-                "services": {
-                    "database": "healthy" if db_healthy else "unhealthy",
-                    "ai_services": "not_implemented",
-                    "websocket": "not_implemented",
-                    "cursor_connector": "not_implemented"
-                }
+                "service": service_name,
+                "status": result.status.value,
+                "details": result.details,
+                "response_time_ms": result.response_time_ms,
+                "error": result.error,
+                "timestamp": result.timestamp.isoformat()
+            }
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Service health check failed for {service_name}: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to check {service_name} health: {str(e)}")
+    
+    @app.get("/health/history", tags=["health"])
+    async def get_health_history(limit: int = 10):
+        """
+        Get recent health check history.
+        
+        Args:
+            limit: Number of recent checks to return (max 100)
+            
+        Returns:
+            dict: Health check history
+        """
+        from app.core.health import health_manager
+        
+        try:
+            limit = min(max(limit, 1), 100)  # Clamp between 1 and 100
+            history = health_manager.get_health_history(limit)
+            
+            return {
+                "history": history,
+                "count": len(history),
+                "requested_limit": limit
             }
             
         except Exception as e:
-            logger.error(f"Health check failed: {str(e)}")
-            raise HTTPException(status_code=503, detail="Service unavailable")
+            logger.error(f"Failed to get health history: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to retrieve health history")
     
     # Root endpoint
     @app.get("/", tags=["root"])
@@ -173,16 +255,25 @@ def create_app() -> FastAPI:
             "version": settings.version,
             "description": "AI Orchestration System for Raspberry Pi deployment",
             "docs_url": "/docs" if settings.debug else None,
-            "health_url": "/health"
+            "health_url": "/health",
+            "health_endpoints": {
+                "comprehensive": "/health",
+                "service_specific": "/health/services/{service_name}",
+                "history": "/health/history"
+            }
         }
     
     # Include API routers
     from app.api import tasks_router, messages_router, connectors_router, websocket_router
+    from app.api.gemini import router as gemini_router
+    from app.api.cursor import router as cursor_router
     
     app.include_router(tasks_router, prefix="/api/tasks", tags=["tasks"])
     app.include_router(messages_router, prefix="/api", tags=["messages"])  # Already has /tasks prefix
     app.include_router(connectors_router, prefix="/api/connectors", tags=["connectors"])
     app.include_router(websocket_router, tags=["websocket"])
+    app.include_router(gemini_router, tags=["gemini"])
+    app.include_router(cursor_router, tags=["cursor"])
     
     return app
 

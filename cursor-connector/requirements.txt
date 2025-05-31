@@ -1,0 +1,28 @@
+# Core Dependencies
+aiohttp==3.9.1          # Async HTTP client for RPi communication
+asyncio-mqtt==0.16.2    # Optional MQTT support for real-time communication
+pydantic==2.5.2         # Data validation and settings management
+pydantic-settings==2.1.0 # Settings management for Pydantic v2
+structlog==23.2.0       # Structured logging
+
+# UI Automation Dependencies
+pyautogui==0.9.54       # Cross-platform GUI automation
+pynput==1.7.6           # Keyboard and mouse control
+pyperclip==1.8.2        # Clipboard operations
+psutil==5.9.6           # System and process utilities
+
+# Platform-Specific Dependencies (conditional imports)
+pywin32==306; sys_platform == "win32"         # Windows-specific automation
+pyobjc-framework-Cocoa==10.1; sys_platform == "darwin"  # macOS-specific automation  
+python-xlib==0.33; sys_platform == "linux"   # Linux X11 automation
+
+# Development Dependencies
+pytest==7.4.3          # Testing framework
+pytest-asyncio==0.21.1 # Async testing support
+pytest-mock==3.12.0    # Mocking for tests
+black==23.11.0          # Code formatting
+isort==5.12.0           # Import sorting
+
+# Configuration and Environment
+python-dotenv==1.0.0    # Environment variable management
+configparser==6.0.0     # Configuration file parsing 
