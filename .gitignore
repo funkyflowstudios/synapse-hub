@@ -360,3 +360,24 @@ rpi-backend/.env
 rpi-backend/logs/
 rpi-backend/uploads/
 
+# Temporary test files and development artifacts
+test_*.py
+*_test.py
+temp_*.py
+temporary_*.py
+quick_*.py
+integration_test.py
+test_integration.py
+
+# Duplicate documentation files  
+README_*.md
+*_DUPLICATE.*
+*_COPY.*
+*_BACKUP.*
+
+# Progress tracking files (keep only main ones)
+docs/progress/IMPLEMENTATION_BREADCRUMBS.md
+docs/progress/PHASE_*_COMPLETION_SUMMARY.md
+docs/progress/TEMP_*.md
+docs/progress/OLD_*.md
+
