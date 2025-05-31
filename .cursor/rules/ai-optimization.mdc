@@ -1,0 +1,79 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Claude 4 Sonnet AI Optimization Rules
+
+## Model Configuration
+- Use extended thinking mode for complex problems requiring deep reasoning
+- Leverage parallel tool execution for maximum efficiency
+- Enable memory mode for maintaining context across long sessions
+- Utilize hybrid reasoning: instant responses for simple tasks, extended thinking for complex ones
+
+## Coding Excellence
+- Write production-ready, maintainable code following SOLID principles
+- Use TypeScript with strict typing for JavaScript projects
+- Implement comprehensive error handling with specific error types
+- Generate unit tests for all new functions and components
+- Follow project-specific coding conventions and style guides
+- Prioritize security best practices in all implementations
+
+## Performance Optimization
+- Optimize for both development speed and runtime performance
+- Use efficient algorithms and data structures
+- Implement caching strategies where appropriate
+- Consider memory usage and computational complexity
+- Profile and benchmark performance-critical code
+
+## Development Workflow
+- Make atomic, focused changes that address specific requirements
+- Use semantic commit messages following conventional commits
+- Implement feature flags for gradual rollouts
+- Maintain backwards compatibility unless explicitly requested otherwise
+- Document breaking changes and migration paths
+
+## AI Collaboration
+- Ask clarifying questions before starting complex implementations
+- Propose multiple approaches for significant architectural decisions
+- Explain reasoning behind code choices and trade-offs
+- Suggest improvements and optimizations proactively
+- Validate requirements and edge cases before implementation
+
+## Quality Assurance
+- Implement comprehensive test coverage (unit, integration, e2e)
+- Use static analysis tools and linters
+- Follow accessibility best practices for UI components
+- Implement proper logging and monitoring
+- Consider edge cases and error scenarios
+
+## Project Context Awareness
+- Understand the existing codebase architecture and patterns
+- Respect established conventions and design decisions
+- Integrate seamlessly with existing systems and APIs
+- Consider scalability and maintainability implications
+- Align with project goals and technical constraints
+
+## Extended Thinking Guidelines
+- Use extended thinking for:
+  - Complex architectural decisions
+  - Multi-step refactoring processes
+  - Performance optimization strategies
+  - Security vulnerability analysis
+  - Complex debugging scenarios
+- Provide thinking summaries for transparency
+- Show step-by-step reasoning for complex problems
+
+## Tool Usage Excellence
+- Use tools in parallel when performing independent operations
+- Leverage file system operations efficiently
+- Integrate with version control systems properly
+- Utilize debugging and testing tools effectively
+- Automate repetitive tasks where possible
+
+## Communication Standards
+- Provide clear, actionable feedback and suggestions
+- Explain complex concepts in understandable terms
+- Offer alternatives and trade-offs for decisions
+- Be proactive in identifying potential issues
+- Maintain professional and helpful tone throughout interactions

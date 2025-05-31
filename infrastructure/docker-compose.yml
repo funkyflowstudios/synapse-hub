@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # Main SvelteKit Application
+  synapse-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"  # Vite dev server
+      - "4173:4173"  # Preview server
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - /app/.svelte-kit  # Exclude build artifacts
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+      - VITE_WS_URL=ws://localhost:3001
+      - DATABASE_URL=file:./local.db
+      - PUBLIC_APP_NAME=Synapse-Hub
+      - PUBLIC_APP_VERSION=0.0.1
+    depends_on:
+      - database
+      - redis
+    networks:
+      - synapse-network
+    command: npm run dev -- --host 0.0.0.0
+    restart: unless-stopped
+
+  # Database (SQLite with better-sqlite3)
+  database:
+    image: alpine:latest
+    volumes:
+      - db_data:/data
+      - ./local.db:/data/synapse.db
+    networks:
+      - synapse-network
+    command: tail -f /dev/null  # Keep container running
+    restart: unless-stopped
+
+  # Redis for session storage and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - synapse-network
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  # Storybook Development Server
+  storybook:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "6006:6006"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - synapse-network
+    command: npm run storybook -- --host 0.0.0.0
+    restart: unless-stopped
+
+  # Drizzle Studio for Database Management
+  drizzle-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4983:4983"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - ./local.db:/app/local.db
+    environment:
+      - DATABASE_URL=file:./local.db
+    networks:
+      - synapse-network
+    command: npm run db:studio -- --host 0.0.0.0
+    restart: unless-stopped
+
+  # WebSocket Server (Future Implementation)
+  websocket-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - WS_PORT=3001
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=file:./local.db
+    depends_on:
+      - redis
+      - database
+    networks:
+      - synapse-network
+    command: npm run dev:websocket
+    restart: unless-stopped
+
+  # Cursor Connector Service (RPi Communication)
+  cursor-connector:
+    build:
+      context: .
+      dockerfile: Dockerfile.connector
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./cursor-connector:/app
+    environment:
+      - NODE_ENV=development
+      - CONNECTOR_PORT=8080
+      - HUB_URL=http://synapse-hub:5173
+      - WS_URL=ws://websocket-server:3001
+    depends_on:
+      - synapse-hub
+      - websocket-server
+    networks:
+      - synapse-network
+    restart: unless-stopped
+
+  # Development Tools Container
+  dev-tools:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev-tools
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WORKSPACE=/workspace
+    networks:
+      - synapse-network
+    command: tail -f /dev/null
+    restart: unless-stopped
+
+volumes:
+  node_modules:
+  db_data:
+  redis_data:
+
+networks:
+  synapse-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 

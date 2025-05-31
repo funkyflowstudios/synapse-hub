@@ -1,0 +1,496 @@
+---
+description: 
+globs: rpi-backend/**/*.py, rpi-backend/app/**/*.py, rpi-backend/tests/**/*.py, rpi-backend/requirements*.txt, rpi-backend/main.py, rpi-backend/alembic/**/*.py, cursor-connector/**/*.py, src/lib/api/**/*.ts, src/lib/stores/**/*.ts, src/lib/types/**/*.ts, src/lib/utils/**/*.ts, **/*test*.{py,ts,js}, **/*spec*.{py,ts,js}, **/*api*.{ts,js}, **/*service*.{py,ts,js}, **/*model*.{py,ts}, **/*schema*.{py,ts}, **/*websocket*.{py,ts}, docker-compose.yml, Dockerfile
+alwaysApply: false
+---
+# Synapse-Hub Development Rules
+
+**Description:** Core development rules for the Synapse-Hub AI orchestration system.
+
+**Applies to:**
+- `rpi-backend/**/*.py` - Backend Python code
+- `rpi-backend/app/**/*.py` - Application code
+- `rpi-backend/tests/**/*.py` - Backend tests
+- `rpi-backend/requirements*.txt` - Python dependencies
+- `rpi-backend/main.py` - Main application entry
+- `rpi-backend/alembic/**/*.py` - Database migrations
+- `cursor-connector/**/*.py` - Cursor connector automation
+- `src/lib/api/**/*.ts` - Frontend API integration
+- `src/lib/stores/**/*.ts` - State management
+- `src/lib/types/**/*.ts` - Type definitions
+- `src/lib/utils/**/*.ts` - Utility functions
+- `**/*test*.{py,ts,js}` - Test files
+- `**/*spec*.{py,ts,js}` - Spec files
+- `**/*api*.{ts,js}` - API-related files
+- `**/*service*.{py,ts,js}` - Service files
+- `**/*model*.{py,ts}` - Model/schema files
+- `**/*schema*.{py,ts}` - Schema files
+- `**/*websocket*.{py,ts}` - WebSocket files
+- `docker-compose.yml` - Docker configuration
+- `Dockerfile` - Container configuration
+
+**AI Development Note:** These rules are optimized for AI-driven development with emphasis on complete specifications, context preservation, and rapid validation.
+
+---
+
+## AI Development Framework
+
+### Foundation First (CRITICAL)
+- **NEVER start implementation without complete interface definitions**
+- **Always define all Pydantic models and TypeScript interfaces before any coding**
+- **Establish complete API contracts via OpenAPI spec before implementation**
+- **Document all component dependencies and data flows upfront**
+
+### Context Preservation
+- **Implementation Status Tracking**: Update progress in real-time using @file AI_DEVELOPMENT_OPTIMIZATION_CHECKLIST.md
+- **Session Context Files**: Maintain rich context for AI session continuity
+- **Decision Documentation**: Record all architectural decisions with rationale
+- **Code Pattern References**: Use established patterns consistently
+
+### Rapid Validation
+- **Generate tests alongside implementation in same session**
+- **Create smoke tests for immediate functionality validation**
+- **Implement health checks for all components**
+- **Use mock data for realistic testing scenarios**
+
+---
+
+## Project Architecture & Context
+
+### Multi-Component System Architecture
+- **Components**: SvelteKit UI, FastAPI backend (Raspberry Pi 3B), Python Cursor Connector
+- **Communication**: REST APIs + WebSockets for real-time updates
+- **Data Flow**: UI ↔ RPi Backend ↔ AI Services (Gemini API + Cursor Connector)
+- **Key Constraints**: Raspberry Pi 3B resource limitations, real-time requirements, cross-platform compatibility
+
+### Architectural Principles
+- **API-First Design**: Complete OpenAPI specifications before any implementation
+- **Event-Driven Architecture**: Loose coupling via events and WebSockets
+- **Type Safety**: Shared type definitions between Python and TypeScript
+- **Resilient Communication**: Graceful handling of network failures and reconnection
+- **Resource Optimization**: Memory and CPU efficiency for Raspberry Pi constraints
+
+---
+
+## Backend Development Standards (FastAPI/Python)
+
+### Required Project Structure
+```
+rpi-backend/
+├── app/
+│   ├── models/           # SQLAlchemy models with relationships
+│   ├── schemas/          # Pydantic request/response models
+│   ├── api/
+│   │   ├── routes/       # FastAPI route handlers
+│   │   └── dependencies/ # Dependency injection
+│   ├── services/         # Business logic services
+│   ├── core/
+│   │   ├── config.py     # Settings management
+│   │   ├── database.py   # Database connection
+│   │   └── websocket.py  # WebSocket manager
+│   └── connectors/       # AI service integrations
+├── tests/
+├── requirements.txt
+├── requirements-dev.txt
+└── main.py
+```
+
+### Service Pattern (MANDATORY)
+```python
+# All business logic MUST follow this service pattern
+class TaskService:
+    def __init__(self, db: AsyncSession, websocket_manager: WebSocketManager):
+        self.db = db
+        self.websocket_manager = websocket_manager
+    
+    async def create_task(self, task_data: TaskCreate) -> Task:
+        # 1. Input validation (Pydantic handles this)
+        # 2. Business logic implementation
+        # 3. Database operations with proper error handling
+        # 4. WebSocket event emission for real-time updates
+        # 5. Return response with proper typing
+        
+        task = Task(**task_data.dict())
+        self.db.add(task)
+        await self.db.commit()
+        await self.db.refresh(task)
+        
+        # Emit WebSocket event
+        await self.websocket_manager.broadcast_task_update(task)
+        
+        return task
+```
+
+### Database Models (MANDATORY PATTERNS)
+```python
+# All models MUST follow this pattern
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from uuid import uuid4
+
+class Task(Base):
+    __tablename__ = "tasks"
+    
+    # Primary key as UUID string
+    task_id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid4()))
+    
+    # Required fields with proper types
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[TaskStatus] = mapped_column(Enum(TaskStatus), default=TaskStatus.PENDING)
+    
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships with proper loading strategy
+    messages: Mapped[List["Message"]] = relationship(back_populates="task", lazy="selectin")
+```
+
+### API Response Standards
+```python
+# Standard response format for all endpoints
+class TaskResponse(BaseModel):
+    task_id: str
+    title: str
+    description: Optional[str]
+    status: TaskStatus
+    created_at: datetime
+    updated_at: datetime
+    messages: List[MessageResponse] = []
+
+# Error response format
+class ErrorResponse(BaseModel):
+    detail: str
+    code: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+```
+
+### WebSocket Communication Protocol
+```python
+# Standard WebSocket message format
+class WebSocketMessage(BaseModel):
+    type: str  # "task_update", "new_message", "agent_status", etc.
+    payload: Dict[str, Any]
+    task_id: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+# WebSocket manager implementation
+class WebSocketManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+    
+    async def broadcast_task_update(self, task: Task):
+        message = WebSocketMessage(
+            type="task_update",
+            payload=task.dict(),
+            task_id=task.task_id
+        )
+        await self.broadcast(message.json())
+```
+
+---
+
+## Frontend Development Standards (SvelteKit)
+
+### Required Project Structure
+```
+src/
+├── lib/
+│   ├── api/              # API client and types
+│   ├── stores/           # Svelte stores for state management
+│   ├── types/            # TypeScript type definitions
+│   └── utils/            # Utility functions
+├── components/
+│   ├── panels/           # Main interface panels
+│   ├── ui/               # Reusable UI components
+│   └── layout/           # Layout components
+└── routes/               # SvelteKit routes
+```
+
+### API Integration (MANDATORY PATTERN)
+```typescript
+// Centralized API client with complete error handling
+export class SynapseHubAPI {
+    private baseUrl: string = 'http://localhost:8000';
+    private ws: WebSocket | null = null;
+    
+    // Task management
+    async createTask(task: TaskCreate): Promise<TaskResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(task)
+            });
+            
+            if (!response.ok) {
+                const error: ErrorResponse = await response.json();
+                throw new APIError(error.detail, response.status);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
+    }
+    
+    // WebSocket connection with auto-reconnection
+    connectWebSocket(onMessage: (data: WebSocketMessage) => void) {
+        const connect = () => {
+            this.ws = new WebSocket('ws://localhost:8000/ws');
+            
+            this.ws.onopen = () => console.log('WebSocket connected');
+            this.ws.onmessage = (event) => {
+                const data: WebSocketMessage = JSON.parse(event.data);
+                onMessage(data);
+            };
+            this.ws.onclose = () => {
+                console.log('WebSocket disconnected, reconnecting...');
+                setTimeout(connect, 5000); // Auto-reconnect after 5 seconds
+            };
+        };
+        
+        connect();
+    }
+}
+```
+
+### State Management (MANDATORY PATTERNS)
+```typescript
+// Global store structure for all state
+interface AppState {
+    tasks: TaskResponse[];
+    messages: MessageResponse[];
+    agentStatus: Record<string, AgentStatus>;
+    ui: {
+        loading: boolean;
+        error: string | null;
+        connected: boolean;
+    };
+}
+
+// Real-time store with WebSocket integration
+export const appStore = (() => {
+    const { subscribe, update } = writable<AppState>({
+        tasks: [],
+        messages: [],
+        agentStatus: {},
+        ui: { loading: false, error: null, connected: false }
+    });
+    
+    const api = new SynapseHubAPI();
+    
+    // WebSocket message handler
+    const handleWebSocketMessage = (data: WebSocketMessage) => {
+        update(state => {
+            switch (data.type) {
+                case 'task_update':
+                    return updateTaskInState(state, data.payload);
+                case 'new_message':
+                    return addMessageToState(state, data.payload);
+                case 'agent_status':
+                    return updateAgentStatus(state, data.payload);
+                default:
+                    return state;
+            }
+        });
+    };
+    
+    // Initialize WebSocket connection
+    api.connectWebSocket(handleWebSocketMessage);
+    
+    return {
+        subscribe,
+        createTask: async (task: TaskCreate) => {
+            update(state => ({ ...state, ui: { ...state.ui, loading: true } }));
+            try {
+                const newTask = await api.createTask(task);
+                update(state => ({
+                    ...state,
+                    tasks: [...state.tasks, newTask],
+                    ui: { ...state.ui, loading: false }
+                }));
+            } catch (error) {
+                update(state => ({
+                    ...state,
+                    ui: { ...state.ui, loading: false, error: error.message }
+                }));
+            }
+        }
+    };
+})();
+```
+
+---
+
+## Cursor Connector Development
+
+### Cross-Platform Architecture (MANDATORY)
+```python
+from abc import ABC, abstractmethod
+import platform
+from typing import Optional
+
+class CursorAutomationStrategy(ABC):
+    @abstractmethod
+    async def send_prompt(self, prompt: str) -> str:
+        """Send prompt to Cursor and return response"""
+        pass
+    
+    @abstractmethod
+    async def check_cursor_available(self) -> bool:
+        """Check if Cursor is available and ready"""
+        pass
+    
+    @abstractmethod
+    async def detect_ssh_context(self) -> Optional[SSHContext]:
+        """Detect current SSH connection context"""
+        pass
+
+class MacOSCursorAutomation(CursorAutomationStrategy):
+    async def send_prompt(self, prompt: str) -> str:
+        # AppleScript implementation for macOS
+        applescript = f'''
+        tell application "Cursor"
+            activate
+            tell application "System Events"
+                keystroke "l" using {{command down}}
+                delay 0.5
+                keystroke "{prompt}"
+                keystroke return
+            end tell
+        end tell
+        '''
+        # Execute AppleScript and extract response
+        pass
+
+def get_automation_strategy() -> CursorAutomationStrategy:
+    system = platform.system()
+    if system == "Darwin":
+        return MacOSCursorAutomation()
+    elif system == "Windows":
+        return WindowsCursorAutomation()
+    elif system == "Linux":
+        return LinuxCursorAutomation()
+    else:
+        raise UnsupportedPlatformError(f"Platform {system} not supported")
+```
+
+---
+
+## Testing Standards (MANDATORY FOR ALL COMPONENTS)
+
+### Backend Testing
+```python
+# Test file template - use for ALL backend tests
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models import Task
+from app.schemas import TaskCreate
+
+@pytest.mark.asyncio
+async def test_create_task_endpoint(client: AsyncClient, db_session: AsyncSession):
+    # Arrange
+    task_data = {
+        "title": "Test Task",
+        "description": "Test Description",
+        "target_agent": "gemini"
+    }
+    
+    # Act
+    response = await client.post("/api/tasks", json=task_data)
+    
+    # Assert
+    assert response.status_code == 201
+    data = response.json()
+    assert data["title"] == "Test Task"
+    assert "task_id" in data
+    
+    # Verify database state
+    db_task = await db_session.get(Task, data["task_id"])
+    assert db_task is not None
+    assert db_task.title == "Test Task"
+```
+
+### Frontend Testing
+```typescript
+// Test file template - use for ALL frontend tests
+import { render, screen, fireEvent } from '@testing-library/svelte';
+import { vi } from 'vitest';
+import TaskCreationForm from './TaskCreationForm.svelte';
+
+describe('TaskCreationForm', () => {
+    test('creates task with proper validation', async () => {
+        const mockCreateTask = vi.fn();
+        
+        render(TaskCreationForm, {
+            props: { onCreateTask: mockCreateTask }
+        });
+        
+        // Fill form
+        await fireEvent.input(screen.getByLabelText('Task Title'), {
+            target: { value: 'Test Task' }
+        });
+        
+        // Submit form
+        await fireEvent.click(screen.getByRole('button', { name: 'Create Task' }));
+        
+        // Verify API call
+        expect(mockCreateTask).toHaveBeenCalledWith({
+            title: 'Test Task',
+            description: '',
+            target_agent: 'gemini'
+        });
+    });
+});
+```
+
+---
+
+## Development Workflow (MANDATORY)
+
+### Code Quality Requirements
+```bash
+# Pre-commit hooks (MUST be set up)
+#!/bin/sh
+# .git/hooks/pre-commit
+
+# Python formatting and linting
+black . --line-length 88
+isort .
+mypy .
+
+# TypeScript formatting and linting
+npm run format
+npm run lint
+
+# Run tests
+npm run test:unit
+```
+
+### Environment Setup (STANDARDIZED)
+```bash
+# Backend setup script
+#!/bin/bash
+cd rpi-backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements-dev.txt
+alembic upgrade head
+
+# Frontend setup script
+#!/bin/bash
+npm install
+npm run build
+
+# Development start script
+#!/bin/bash
+# Start all services
+docker-compose up -d
+npm run dev &
+cd rpi-backend && python main.py &
+cd cursor-connector && python main.py &
+```
+
+This comprehensive rule set ensures efficient, reliable, and consistent AI-driven development across all Synapse-Hub components while maintaining existing design principles and performance standards.

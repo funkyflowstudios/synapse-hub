@@ -1,0 +1,639 @@
+---
+description: 
+globs: src/components/layout/**/*.svelte, src/components/panels/**/*.svelte, src/routes/**/*.svelte, src/app.html, src/lib/types/layout.ts, src/lib/stores/layout.ts, **/*layout*.svelte, **/*panel*.svelte, **/*grid*.svelte, **/*responsive*.svelte, **/*breakpoint*.{ts,js}, vite.config.ts, svelte.config.js
+alwaysApply: false
+---
+# Layout Component Conventions
+
+**Description:** Layout component standards for Synapse Hub's three-panel adaptive system.
+
+**Applies to:**
+- `src/components/layout/**/*.svelte` - Layout components
+- `src/components/panels/**/*.svelte` - Panel components
+- `src/routes/**/*.svelte` - Page layouts (when working on layout structure)
+- `src/app.html` - Main application layout
+- `src/lib/types/layout.ts` - Layout type definitions
+- `src/lib/stores/layout.ts` - Layout state management
+- `**/*layout*.svelte` - Layout-related components
+- `**/*panel*.svelte` - Panel components
+- `**/*grid*.svelte` - Grid layout components
+- `**/*responsive*.svelte` - Responsive components
+- `**/*breakpoint*.{ts,js}` - Breakpoint utilities
+- `vite.config.ts` - For viewport meta configuration
+- `svelte.config.js` - Layout preprocessing
+
+**Layout Philosophy:** "Fluidly adaptive" three-panel system with subtle panel width shifts based on focus and content.
+
+---
+
+## Core Principles (MANDATORY)
+
+### Semantic HTML Requirements
+```svelte
+<!-- All layout components MUST use semantic elements -->
+<main role="application" class="synapse-layout">
+  <header class="app-header">
+    <nav aria-label="Main navigation">
+      <!-- Navigation content -->
+    </nav>
+  </header>
+  
+  <aside 
+    class="input-control-nexus"
+    role="complementary"
+    aria-label="AI Agent Controls"
+    tabindex="0"
+  >
+    <h2>Input Control Nexus</h2>
+    <!-- Left panel content -->
+  </aside>
+  
+  <section 
+    class="co-creation-canvas"
+    role="main"
+    aria-label="Task Creation and Management"
+  >
+    <h2>Co-Creation Canvas</h2>
+    <!-- Center panel content -->
+  </section>
+  
+  <aside 
+    class="orchestration-foresight-deck"
+    role="complementary"
+    aria-label="Task Orchestration and Insights"
+    tabindex="0"
+  >
+    <h2>Orchestration Foresight Deck</h2>
+    <!-- Right panel content -->
+  </aside>
+  
+  <footer class="app-footer">
+    <!-- Footer content -->
+  </footer>
+</main>
+```
+
+### Responsive Design Standards
+```css
+/* Three-panel responsive breakpoints */
+.synapse-layout {
+  display: grid;
+  min-height: 100vh;
+  transition: grid-template-columns var(--transition-smooth);
+}
+
+/* Desktop: Three-column layout (>= 1200px) */
+@media (min-width: 1200px) {
+  .synapse-layout {
+    grid-template-columns: 
+      var(--panel-left-width, 25%) 
+      1fr 
+      var(--panel-right-width, 30%);
+    grid-template-areas:
+      "header header header"
+      "left center right"
+      "footer footer footer";
+  }
+}
+
+/* Tablet: Two-column + floating island (768px - 1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .synapse-layout {
+    grid-template-columns: 1fr var(--panel-right-width, 35%);
+    grid-template-areas:
+      "header header"
+      "center right"
+      "footer footer";
+  }
+  
+  .input-control-nexus {
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    width: 280px;
+    z-index: 100;
+    border-radius: var(--radius-lg);
+    background: var(--glass-elevated-bg);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Mobile: Single-column with persistent footer (< 768px) */
+@media (max-width: 767px) {
+  .synapse-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "center"
+      "footer";
+  }
+  
+  .input-control-nexus,
+  .orchestration-foresight-deck {
+    display: none; /* Hidden by default, accessible via navigation */
+  }
+  
+  .mobile-panel-toggle {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 200;
+  }
+}
+```
+
+### Adaptive Panel System (MANDATORY)
+```svelte
+<script lang="ts">
+  import { writable } from 'svelte/store';
+  
+  // Panel width management
+  export let leftPanelWidth = writable('25%');
+  export let rightPanelWidth = writable('30%');
+  export let focusedPanel = writable<'left' | 'center' | 'right' | null>(null);
+  
+  // Reactive width adjustments based on focus
+  $: {
+    if ($focusedPanel === 'left') {
+      leftPanelWidth.set('30%');
+      rightPanelWidth.set('25%');
+    } else if ($focusedPanel === 'right') {
+      leftPanelWidth.set('22%');
+      rightPanelWidth.set('35%');
+    } else {
+      leftPanelWidth.set('25%');
+      rightPanelWidth.set('30%');
+    }
+  }
+  
+  function handlePanelFocus(panel: 'left' | 'center' | 'right') {
+    focusedPanel.set(panel);
+  }
+  
+  function handlePanelBlur() {
+    // Delay to allow for focus to move within panel
+    setTimeout(() => {
+      if (!document.activeElement?.closest('.synapse-panel')) {
+        focusedPanel.set(null);
+      }
+    }, 100);
+  }
+</script>
+
+<style>
+  .synapse-layout {
+    --panel-left-width: {$leftPanelWidth};
+    --panel-right-width: {$rightPanelWidth};
+  }
+  
+  .synapse-panel {
+    transition: all var(--transition-smooth);
+    container-type: inline-size; /* Future container queries */
+  }
+  
+  /* Smooth transitions with cubic-bezier */
+  .synapse-panel {
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .synapse-panel {
+      transition: none;
+    }
+  }
+</style>
+
+<main 
+  class="synapse-layout"
+  style="--panel-left-width: {$leftPanelWidth}; --panel-right-width: {$rightPanelWidth}"
+>
+  <aside 
+    class="synapse-panel input-control-nexus"
+    on:focusin={() => handlePanelFocus('left')}
+    on:focusout={handlePanelBlur}
+  >
+    <!-- Left panel content -->
+  </aside>
+  
+  <section 
+    class="synapse-panel co-creation-canvas"
+    on:focusin={() => handlePanelFocus('center')}
+    on:focusout={handlePanelBlur}
+  >
+    <!-- Center panel content -->
+  </section>
+  
+  <aside 
+    class="synapse-panel orchestration-foresight-deck"
+    on:focusin={() => handlePanelFocus('right')}
+    on:focusout={handlePanelBlur}
+  >
+    <!-- Right panel content -->
+  </aside>
+</main>
+```
+
+---
+
+## Performance Requirements (MANDATORY)
+
+### Long Animation Frames (LoAF) Target: <50ms
+```css
+/* GPU-accelerated panel transitions */
+.synapse-panel {
+  transform: translateZ(0); /* Force GPU layer */
+  will-change: width, transform;
+  
+  /* Use transform for animations, not layout properties */
+  transition: transform var(--transition-smooth);
+}
+
+.synapse-panel.focused {
+  transform: translateZ(0) scale(1.02); /* GPU-accelerated scaling */
+}
+
+/* Avoid layout-triggering properties */
+/* ❌ Avoid: width, height, padding, margin for animations */
+/* ✅ Use: transform, opacity */
+```
+
+### Backdrop Filter Implementation
+```css
+/* Liquid crystal control effects */
+.liquid-crystal-control {
+  background: var(--glass-secondary-bg);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  /* Fallback for unsupported browsers */
+  @supports not (backdrop-filter: blur(12px)) {
+    background: var(--color-surface-secondary);
+  }
+}
+
+/* High contrast mode fallback */
+@media (prefers-contrast: high) {
+  .liquid-crystal-control {
+    backdrop-filter: none;
+    background: var(--color-surface-primary);
+    border: 2px solid var(--color-border-primary);
+  }
+}
+```
+
+---
+
+## Component Structure (MANDATORY)
+
+### Layout Component Pattern
+```svelte
+<!-- src/components/layout/ThreePanelLayout.svelte -->
+<script lang="ts">
+  import type { ComponentType } from 'svelte';
+  
+  export let leftPanel: ComponentType;
+  export let centerPanel: ComponentType;
+  export let rightPanel: ComponentType;
+  export let leftPanelProps: Record<string, any> = {};
+  export let centerPanelProps: Record<string, any> = {};
+  export let rightPanelProps: Record<string, any> = {};
+  
+  // Reactive width properties for dynamic adjustment
+  export let leftWidth = '25%';
+  export let rightWidth = '30%';
+  
+  // Export width setters for parent components
+  export function setLeftWidth(width: string) {
+    leftWidth = width;
+  }
+  
+  export function setRightWidth(width: string) {
+    rightWidth = width;
+  }
+</script>
+
+<main 
+  class="three-panel-layout"
+  style="--left-width: {leftWidth}; --right-width: {rightWidth}"
+>
+  <aside 
+    class="panel-left"
+    role="complementary"
+    aria-label="Left panel"
+    tabindex="0"
+  >
+    <svelte:component this={leftPanel} {...leftPanelProps} />
+  </aside>
+  
+  <section 
+    class="panel-center"
+    role="main"
+    aria-label="Main content"
+  >
+    <svelte:component this={centerPanel} {...centerPanelProps} />
+  </section>
+  
+  <aside 
+    class="panel-right"
+    role="complementary"
+    aria-label="Right panel"
+    tabindex="0"
+  >
+    <svelte:component this={rightPanel} {...rightPanelProps} />
+  </aside>
+</main>
+
+<style>
+  .three-panel-layout {
+    display: grid;
+    grid-template-columns: var(--left-width) 1fr var(--right-width);
+    grid-template-areas: "left center right";
+    height: 100vh;
+    gap: var(--spacing-sm);
+  }
+  
+  .panel-left { grid-area: left; }
+  .panel-center { grid-area: center; }
+  .panel-right { grid-area: right; }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1199px) {
+    .three-panel-layout {
+      grid-template-columns: 1fr var(--right-width);
+      grid-template-areas: "center right";
+    }
+    
+    .panel-left {
+      position: fixed;
+      /* Floating island styling */
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .three-panel-layout {
+      grid-template-columns: 1fr;
+      grid-template-areas: "center";
+    }
+    
+    .panel-left,
+    .panel-right {
+      display: none;
+    }
+  }
+</style>
+```
+
+### Panel Component Interface
+```typescript
+// src/lib/types/layout.ts
+export interface PanelComponent {
+  // Required properties for all panel components
+  width?: string;
+  height?: string;
+  focused?: boolean;
+  
+  // Events
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onResize?: (width: string, height: string) => void;
+}
+
+export interface LayoutState {
+  leftPanelWidth: string;
+  rightPanelWidth: string;
+  focusedPanel: 'left' | 'center' | 'right' | null;
+  breakpoint: 'mobile' | 'tablet' | 'desktop';
+}
+
+export interface ResponsiveBreakpoints {
+  mobile: { max: 767 };
+  tablet: { min: 768, max: 1199 };
+  desktop: { min: 1200 };
+}
+```
+
+---
+
+## Accessibility Standards (MANDATORY)
+
+### Keyboard Navigation
+```svelte
+<script lang="ts">
+  function handleKeyNavigation(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'F6': // Standard panel navigation key
+        cyclePanelFocus();
+        event.preventDefault();
+        break;
+      case 'Escape':
+        focusMainContent();
+        event.preventDefault();
+        break;
+    }
+  }
+  
+  function cyclePanelFocus() {
+    const panels = ['left', 'center', 'right'] as const;
+    const currentIndex = panels.indexOf($focusedPanel || 'center');
+    const nextIndex = (currentIndex + 1) % panels.length;
+    focusedPanel.set(panels[nextIndex]);
+  }
+</script>
+
+<svelte:window on:keydown={handleKeyNavigation} />
+```
+
+### ARIA Live Regions
+```svelte
+<!-- Announce panel changes to screen readers -->
+<div 
+  aria-live="polite" 
+  aria-atomic="true" 
+  class="sr-only"
+>
+  {#if $focusedPanel}
+    Focused on {$focusedPanel} panel
+  {/if}
+</div>
+
+<!-- Panel resize announcements -->
+<div 
+  aria-live="polite" 
+  class="sr-only"
+>
+  {#if panelResized}
+    Panel width adjusted to {newWidth}
+  {/if}
+</div>
+```
+
+---
+
+## Future Enhancements (Placeholder Implementation)
+
+### Container Query Preparation
+```css
+/* Placeholder for future stateful container queries */
+.panel-component {
+  container-type: inline-size;
+  
+  /* Future: Query based on app state */
+  /* @container synapse-app (focus-mode: active) { ... } */
+  /* @container synapse-app (a2a-active: true) { ... } */
+}
+
+/* Current implementation using CSS custom properties */
+.panel-component[data-focus-mode="true"] {
+  --panel-opacity: 0.3;
+  --panel-blur: 4px;
+}
+
+.panel-component[data-a2a-active="true"] {
+  --panel-highlight: var(--color-accent-primary);
+  --panel-border-width: 2px;
+}
+```
+
+### Gesture-Based Panel Manipulation
+```typescript
+// Future: Touch gesture support
+interface GestureHandler {
+  onSwipeLeft(panel: PanelType): void;
+  onSwipeRight(panel: PanelType): void;
+  onPinch(panel: PanelType, scale: number): void;
+  onTwoFingerPan(panel: PanelType, deltaX: number): void;
+}
+
+// Placeholder for gesture recognition
+export const gestureHandler: GestureHandler = {
+  onSwipeLeft: (panel) => {
+    // Future: Navigate to next panel
+  },
+  onSwipeRight: (panel) => {
+    // Future: Navigate to previous panel
+  },
+  onPinch: (panel, scale) => {
+    // Future: Resize panel based on pinch gesture
+  },
+  onTwoFingerPan: (panel, deltaX) => {
+    // Future: Adjust panel width with two-finger pan
+  }
+};
+```
+
+### WebGL Background Materials
+```typescript
+// Future: WebGL-based generative background materials
+interface WebGLPanelRenderer {
+  initializeRenderer(canvas: HTMLCanvasElement): void;
+  renderPanelBackground(panelType: PanelType, state: LayoutState): void;
+  updateMaterial(properties: MaterialProperties): void;
+  cleanup(): void;
+}
+
+// Placeholder implementation
+export const webglRenderer: WebGLPanelRenderer = {
+  initializeRenderer: (canvas) => {
+    // Future: Initialize WebGL context and shaders
+  },
+  renderPanelBackground: (panelType, state) => {
+    // Future: Render generative materials based on panel state
+  },
+  updateMaterial: (properties) => {
+    // Future: Update material properties for visual feedback
+  },
+  cleanup: () => {
+    // Future: Clean up WebGL resources
+  }
+};
+```
+
+---
+
+## Testing Requirements (MANDATORY)
+
+### Component Testing
+```typescript
+import { render, screen } from '@testing-library/svelte';
+import { vi } from 'vitest';
+import ThreePanelLayout from './ThreePanelLayout.svelte';
+
+describe('ThreePanelLayout', () => {
+  test('renders all three panels on desktop', () => {
+    // Mock desktop viewport
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 1400,
+    });
+    
+    render(ThreePanelLayout, {
+      props: {
+        leftPanel: MockLeftPanel,
+        centerPanel: MockCenterPanel,
+        rightPanel: MockRightPanel
+      }
+    });
+    
+    expect(screen.getByRole('complementary', { name: /left panel/i })).toBeInTheDocument();
+    expect(screen.getByRole('main', { name: /main content/i })).toBeInTheDocument();
+    expect(screen.getByRole('complementary', { name: /right panel/i })).toBeInTheDocument();
+  });
+  
+  test('adapts panel widths based on focus', async () => {
+    const { component } = render(ThreePanelLayout);
+    
+    // Simulate panel focus
+    await component.setLeftWidth('35%');
+    await component.setRightWidth('25%');
+    
+    // Verify width changes are applied
+    const layout = screen.getByRole('main');
+    expect(layout).toHaveStyle('--left-width: 35%');
+    expect(layout).toHaveStyle('--right-width: 25%');
+  });
+  
+  test('handles responsive breakpoints correctly', () => {
+    // Test mobile viewport
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 500,
+    });
+    
+    render(ThreePanelLayout);
+    
+    // On mobile, only center panel should be visible
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+  });
+});
+```
+
+### Accessibility Testing
+```typescript
+test('supports keyboard navigation between panels', async () => {
+  const { container } = render(ThreePanelLayout);
+  
+  // Test F6 key navigation
+  await fireEvent.keyDown(container, { key: 'F6' });
+  
+  // Verify focus management
+  expect(document.activeElement).toHaveAttribute('role', 'complementary');
+});
+
+test('announces panel changes to screen readers', async () => {
+  render(ThreePanelLayout);
+  
+  const liveRegion = screen.getByRole('status');
+  
+  // Simulate panel focus change
+  // Verify announcement content
+  expect(liveRegion).toHaveTextContent('Focused on left panel');
+});
+```
+
+This layout convention framework ensures consistent, performant, and accessible implementation of Synapse Hub's adaptive three-panel system while preparing for future enhancements.

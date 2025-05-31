@@ -1,0 +1,87 @@
+FROM node:20-alpine
+
+# Install comprehensive development tools
+RUN apk add --no-cache \
+    git \
+    curl \
+    wget \
+    bash \
+    zsh \
+    oh-my-zsh \
+    vim \
+    nano \
+    jq \
+    yq \
+    docker \
+    docker-compose \
+    python3 \
+    py3-pip \
+    make \
+    g++ \
+    sqlite \
+    redis \
+    openssh-client \
+    rsync \
+    htop \
+    tree \
+    less \
+    grep \
+    sed \
+    awk
+
+# Install global npm tools for development
+RUN npm install -g \
+    tsx \
+    nodemon \
+    concurrently \
+    wait-on \
+    cross-env \
+    rimraf \
+    npm-check-updates \
+    lighthouse \
+    @storybook/cli \
+    drizzle-kit
+
+# Install Python tools
+RUN pip3 install --no-cache-dir \
+    black \
+    flake8 \
+    pytest \
+    requests
+
+# Set up workspace
+WORKDIR /workspace
+
+# Create development user
+RUN addgroup -g 1001 -S developer && \
+    adduser -S developer -u 1001 -G docker
+
+# Configure git for the container
+RUN git config --global init.defaultBranch main && \
+    git config --global user.name "Synapse Hub Developer" && \
+    git config --global user.email "dev@synapse-hub.local"
+
+# Set up shell environment
+RUN chsh -s /bin/zsh developer
+USER developer
+
+# Copy development scripts and tools
+COPY --chown=developer:developer scripts/ /workspace/scripts/
+COPY --chown=developer:developer .env.example /workspace/.env.example
+
+# Create useful aliases and functions
+RUN echo 'alias ll="ls -la"' >> ~/.zshrc && \
+    echo 'alias la="ls -A"' >> ~/.zshrc && \
+    echo 'alias l="ls -CF"' >> ~/.zshrc && \
+    echo 'alias ..="cd .."' >> ~/.zshrc && \
+    echo 'alias ...="cd ../.."' >> ~/.zshrc && \
+    echo 'alias grep="grep --color=auto"' >> ~/.zshrc && \
+    echo 'alias fgrep="fgrep --color=auto"' >> ~/.zshrc && \
+    echo 'alias egrep="egrep --color=auto"' >> ~/.zshrc && \
+    echo 'export PATH="/workspace/scripts:$PATH"' >> ~/.zshrc
+
+# Set default shell
+SHELL ["/bin/zsh", "-c"]
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"] 

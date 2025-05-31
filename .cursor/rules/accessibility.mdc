@@ -1,0 +1,651 @@
+---
+description: 
+globs: src/components/**/*.svelte, src/routes/**/*.svelte, src/app.html, src/app.css, src/lib/components/**/*.svelte, src/lib/stores/accessibility.ts, **/*form*.svelte, **/*button*.svelte, **/*modal*.svelte, **/*navigation*.svelte, **/*accessibility*.{ts,js,svelte}, **/*a11y*.{ts,js,svelte}, **/*test*.{ts,js}, playwright.config.ts
+alwaysApply: false
+---
+# Accessibility Standards
+
+**Description:** WCAG 2.2+ AAA accessibility standards for Synapse Hub.
+
+**Applies to:**
+- `src/components/**/*.svelte` - All UI components
+- `src/routes/**/*.svelte` - Page-level accessibility
+- `src/app.html` - Global accessibility structure
+- `src/app.css` - Global accessibility styles
+- `src/lib/components/**/*.svelte` - Reusable components
+- `src/lib/stores/accessibility.ts` - Accessibility state management
+- `**/*form*.svelte` - Form components
+- `**/*button*.svelte` - Button components
+- `**/*modal*.svelte` - Modal components
+- `**/*navigation*.svelte` - Navigation components
+- `**/*accessibility*.{ts,js,svelte}` - Accessibility-related files
+- `**/*a11y*.{ts,js,svelte}` - A11y files
+- `**/*test*.{ts,js}` - When testing accessibility
+- `playwright.config.ts` - Accessibility testing configuration
+
+**Compliance Target:** WCAG 2.2+ AAA with specific focus on AI-assisted interfaces.
+
+---
+
+## Color & Contrast (MANDATORY)
+
+### Contrast Ratios (WCAG 2.2+ AAA)
+```css
+/* Normal text: 7:1 contrast ratio minimum */
+.text-primary {
+  color: var(--color-text-primary); /* Ensure 7:1 against background */
+}
+
+/* Large text (18pt+ or 14pt+ bold): 4.5:1 minimum */
+.text-large {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+/* Interactive elements: 3:1 contrast ratio for borders/backgrounds */
+.button-primary {
+  background: var(--color-interactive-primary);
+  border: 1px solid var(--color-border-interactive);
+  /* Ensure 3:1 contrast for border against background */
+}
+```
+
+### High Contrast Mode Support
+```css
+/* Detect and respond to high contrast preferences */
+@media (prefers-contrast: high) {
+  :root {
+    --color-background-primary: #000000;
+    --color-text-primary: #ffffff;
+    --color-border-primary: #ffffff;
+    --color-interactive-primary: #ffff00; /* High contrast yellow */
+  }
+  
+  /* Remove subtle effects that may reduce contrast */
+  .glass-morphism {
+    background: var(--color-background-primary) !important;
+    backdrop-filter: none !important;
+  }
+}
+```
+
+---
+
+## Motion & Animation (MANDATORY)
+
+### Reduced Motion Support
+```css
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Provide static alternatives for dynamic content */
+  .liquid-crystal-control {
+    background: var(--color-surface-secondary) !important;
+    backdrop-filter: none !important;
+  }
+  
+  /* Remove transform animations */
+  .hover-transform:hover {
+    transform: none !important;
+  }
+}
+
+/* Safe animation defaults */
+.accessible-animation {
+  animation: gentle-fade 0.3s ease-in-out;
+}
+
+@keyframes gentle-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+```
+
+### Static Alternatives for Dynamic Effects
+```svelte
+<script lang="ts">
+  import { reducedMotion } from '$lib/stores/accessibility';
+  
+  // Detect user preference
+  $: isReducedMotion = $reducedMotion;
+</script>
+
+<!-- Conditional rendering based on motion preference -->
+{#if isReducedMotion}
+  <div class="static-card">
+    <!-- Static version without animations -->
+  </div>
+{:else}
+  <div class="animated-card">
+    <!-- Full animated version -->
+  </div>
+{/if}
+```
+
+---
+
+## Keyboard Navigation (MANDATORY)
+
+### Focus Management
+```css
+/* Visible focus indicators for all interactive elements */
+.focusable:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--color-focus-ring-rgb), 0.3);
+}
+
+/* Skip links for screen readers */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+```
+
+### Keyboard Event Handlers
+```svelte
+<script lang="ts">
+  function handleKeydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'Enter':
+      case ' ': // Space
+        handleActivation();
+        event.preventDefault();
+        break;
+      case 'Escape':
+        handleClose();
+        event.preventDefault();
+        break;
+      case 'ArrowDown':
+        focusNext();
+        event.preventDefault();
+        break;
+      case 'ArrowUp':
+        focusPrevious();
+        event.preventDefault();
+        break;
+    }
+  }
+</script>
+
+<!-- Keyboard-accessible button -->
+<button
+  class="unified-button"
+  on:click={handleClick}
+  on:keydown={handleKeydown}
+  tabindex="0"
+  aria-label="Create new task"
+>
+  Create Task
+</button>
+```
+
+### Tab Order Management
+```svelte
+<script lang="ts">
+  import { onMount } from 'svelte';
+  
+  let focusableElements: HTMLElement[] = [];
+  
+  onMount(() => {
+    // Find all focusable elements in logical order
+    focusableElements = Array.from(
+      document.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+  });
+  
+  function trapFocus(event: KeyboardEvent) {
+    if (event.key !== 'Tab') return;
+    
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    if (event.shiftKey && document.activeElement === firstElement) {
+      lastElement.focus();
+      event.preventDefault();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      firstElement.focus();
+      event.preventDefault();
+    }
+  }
+</script>
+```
+
+---
+
+## Semantic HTML & ARIA (MANDATORY)
+
+### Semantic Structure
+```svelte
+<!-- Use proper semantic elements -->
+<main role="application" aria-label="Synapse Hub Interface">
+  <header>
+    <nav aria-label="Main navigation">
+      <ul role="menubar">
+        <li role="none">
+          <a href="/" role="menuitem" aria-current="page">Home</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  
+  <aside 
+    class="input-control-panel"
+    role="complementary"
+    aria-label="AI Agent Controls"
+    tabindex="0"
+  >
+    <h2 id="agent-controls-heading">Agent Selection</h2>
+    <!-- Panel content -->
+  </aside>
+  
+  <section 
+    class="co-creation-canvas"
+    role="main"
+    aria-label="Task Creation and Management"
+    aria-labelledby="canvas-heading"
+  >
+    <h2 id="canvas-heading">Co-Creation Canvas</h2>
+    <!-- Main content -->
+  </section>
+  
+  <aside 
+    class="orchestration-deck"
+    role="complementary"
+    aria-label="Task Orchestration"
+    tabindex="0"
+  >
+    <h2 id="orchestration-heading">Orchestration Deck</h2>
+    <!-- Orchestration content -->
+  </aside>
+</main>
+```
+
+### ARIA Labels and Descriptions
+```svelte
+<script lang="ts">
+  let taskTitle = '';
+  let isLoading = false;
+  let errorMessage = '';
+</script>
+
+<!-- Form with proper ARIA attributes -->
+<form 
+  aria-label="Create new task"
+  aria-describedby="form-description"
+>
+  <p id="form-description">
+    Create a new task for AI agent collaboration
+  </p>
+  
+  <label for="task-title">Task Title</label>
+  <input
+    id="task-title"
+    type="text"
+    bind:value={taskTitle}
+    aria-required="true"
+    aria-invalid={errorMessage ? 'true' : 'false'}
+    aria-describedby={errorMessage ? 'task-title-error' : null}
+  />
+  
+  {#if errorMessage}
+    <div id="task-title-error" role="alert" aria-live="polite">
+      {errorMessage}
+    </div>
+  {/if}
+  
+  <button 
+    type="submit"
+    aria-describedby="submit-help"
+    disabled={isLoading}
+  >
+    {#if isLoading}
+      <span aria-hidden="true">⏳</span>
+      <span class="sr-only">Creating task...</span>
+    {:else}
+      Create Task
+    {/if}
+  </button>
+  
+  <div id="submit-help" class="help-text">
+    Press Enter or click to create the task
+  </div>
+</form>
+```
+
+### Live Regions for Dynamic Content
+```svelte
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { taskUpdates } from '$lib/stores/tasks';
+  
+  let statusMessage = '';
+  
+  onMount(() => {
+    // Listen for task updates and announce them
+    const unsubscribe = taskUpdates.subscribe((update) => {
+      if (update) {
+        statusMessage = `Task ${update.title} status changed to ${update.status}`;
+        
+        // Clear message after announcement
+        setTimeout(() => {
+          statusMessage = '';
+        }, 3000);
+      }
+    });
+    
+    return unsubscribe;
+  });
+</script>
+
+<!-- ARIA live regions for announcements -->
+<div 
+  aria-live="polite" 
+  aria-atomic="true" 
+  class="sr-only"
+  role="status"
+>
+  {statusMessage}
+</div>
+
+<!-- For urgent announcements -->
+<div 
+  aria-live="assertive" 
+  aria-atomic="true" 
+  class="sr-only"
+  role="alert"
+>
+  {#if errorMessage}
+    Error: {errorMessage}
+  {/if}
+</div>
+```
+
+---
+
+## Screen Reader Support (MANDATORY)
+
+### Descriptive Text and Labels
+```svelte
+<!-- Descriptive button labels -->
+<button 
+  aria-label="Send prompt to Gemini AI agent"
+  class="agent-button"
+>
+  <span aria-hidden="true">🤖</span>
+  <span class="button-text">Gemini</span>
+</button>
+
+<!-- Complex interface descriptions -->
+<div 
+  class="task-status-indicator"
+  role="img"
+  aria-label="Task status: In progress, 3 of 5 steps completed"
+>
+  <!-- Visual progress indicator -->
+  <div class="progress-bar" style="width: 60%"></div>
+</div>
+
+<!-- Table accessibility -->
+<table role="table" aria-label="Task list">
+  <caption>Recent AI collaboration tasks</caption>
+  <thead>
+    <tr>
+      <th scope="col">Task</th>
+      <th scope="col">Agent</th>
+      <th scope="col">Status</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {#each tasks as task}
+      <tr>
+        <th scope="row">{task.title}</th>
+        <td>{task.agent}</td>
+        <td>
+          <span class="sr-only">Status:</span>
+          {task.status}
+        </td>
+        <td>
+          <button aria-label="Edit task {task.title}">Edit</button>
+        </td>
+      </tr>
+    {/each}
+  </tbody>
+</table>
+```
+
+### Screen Reader Only Content
+```css
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focusable screen reader content */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.25rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+```
+
+---
+
+## Form Accessibility (MANDATORY)
+
+### Form Structure and Validation
+```svelte
+<script lang="ts">
+  let formData = {
+    title: '',
+    description: '',
+    agent: ''
+  };
+  
+  let errors: Record<string, string> = {};
+  let touched: Record<string, boolean> = {};
+  
+  function validateField(field: string, value: string) {
+    switch (field) {
+      case 'title':
+        return value.trim().length < 3 ? 'Title must be at least 3 characters' : '';
+      case 'agent':
+        return !value ? 'Please select an AI agent' : '';
+      default:
+        return '';
+    }
+  }
+  
+  function handleBlur(field: string) {
+    touched[field] = true;
+    errors[field] = validateField(field, formData[field]);
+  }
+</script>
+
+<form novalidate>
+  <fieldset>
+    <legend>Task Creation</legend>
+    
+    <div class="form-group">
+      <label for="task-title" class="required">
+        Task Title
+        <span aria-label="required">*</span>
+      </label>
+      <input
+        id="task-title"
+        type="text"
+        bind:value={formData.title}
+        on:blur={() => handleBlur('title')}
+        aria-required="true"
+        aria-invalid={errors.title ? 'true' : 'false'}
+        aria-describedby="task-title-help {errors.title ? 'task-title-error' : ''}"
+      />
+      <div id="task-title-help" class="help-text">
+        Enter a descriptive title for your task
+      </div>
+      {#if errors.title && touched.title}
+        <div id="task-title-error" class="error-message" role="alert">
+          {errors.title}
+        </div>
+      {/if}
+    </div>
+    
+    <div class="form-group">
+      <fieldset>
+        <legend>AI Agent Selection</legend>
+        <div class="radio-group" role="radiogroup" aria-required="true">
+          <label>
+            <input
+              type="radio"
+              name="agent"
+              value="gemini"
+              bind:group={formData.agent}
+              on:change={() => handleBlur('agent')}
+            />
+            <span>Gemini AI</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="agent"
+              value="cursor"
+              bind:group={formData.agent}
+              on:change={() => handleBlur('agent')}
+            />
+            <span>Cursor AI</span>
+          </label>
+        </div>
+        {#if errors.agent && touched.agent}
+          <div class="error-message" role="alert">
+            {errors.agent}
+          </div>
+        {/if}
+      </fieldset>
+    </div>
+  </fieldset>
+</form>
+```
+
+---
+
+## Testing Requirements (MANDATORY)
+
+### Accessibility Testing Checklist
+```typescript
+// Automated accessibility testing
+import { axe, toHaveNoViolations } from 'jest-axe';
+import { render } from '@testing-library/svelte';
+
+expect.extend(toHaveNoViolations);
+
+describe('TaskCreationForm Accessibility', () => {
+  test('should not have any accessibility violations', async () => {
+    const { container } = render(TaskCreationForm);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+  
+  test('supports keyboard navigation', async () => {
+    const { getByRole } = render(TaskCreationForm);
+    const submitButton = getByRole('button', { name: /create task/i });
+    
+    submitButton.focus();
+    expect(document.activeElement).toBe(submitButton);
+  });
+  
+  test('announces status changes to screen readers', async () => {
+    const { getByRole } = render(TaskCreationForm);
+    const statusRegion = getByRole('status');
+    
+    // Simulate task creation
+    // Assert that status region content updates
+    expect(statusRegion).toHaveTextContent('Task created successfully');
+  });
+});
+```
+
+### Manual Testing Requirements
+- [ ] Test with keyboard only (no mouse)
+- [ ] Test with screen reader (VoiceOver on macOS, NVDA on Windows)
+- [ ] Test color contrast in both light and dark themes
+- [ ] Test with 200% browser zoom
+- [ ] Test with reduced motion preference enabled
+- [ ] Test with high contrast mode enabled
+- [ ] Verify all interactive elements have 44px minimum touch target
+- [ ] Ensure all form errors are announced to screen readers
+
+### Accessibility Store for Dynamic Preferences
+```typescript
+// src/lib/stores/accessibility.ts
+import { writable, readable } from 'svelte/store';
+
+// Detect user preferences
+export const reducedMotion = readable(false, (set) => {
+  if (typeof window !== 'undefined') {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    set(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => set(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    
+    return () => mediaQuery.removeEventListener('change', handler);
+  }
+});
+
+export const highContrast = readable(false, (set) => {
+  if (typeof window !== 'undefined') {
+    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
+    set(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => set(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    
+    return () => mediaQuery.removeEventListener('change', handler);
+  }
+});
+
+// User customizable preferences
+export const accessibilityPreferences = writable({
+  fontSize: 'normal', // 'small', 'normal', 'large', 'extra-large'
+  focusIndicatorStyle: 'default', // 'default', 'high-contrast', 'thick'
+  screenReaderAnnouncements: true,
+  autoplayMedia: false
+});
+```
+
+This accessibility framework ensures WCAG 2.2+ AAA compliance while providing excellent support for AI-assisted interfaces and screen reader users.

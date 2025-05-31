@@ -1,0 +1,42 @@
+---
+description: 
+globs: **/*.{js,ts,py}, **/*.svelte, package.json, package-lock.json, requirements*.txt, pyproject.toml, *.config.{js,ts}, .eslintrc*, .prettierrc*, tsconfig.json, vite.config.ts, svelte.config.js, vitest.config.ts, playwright.config.ts, .gitignore, README.md, CONTRIBUTING.md
+alwaysApply: false
+---
+# Core Development Standards
+
+**Description:** Fundamental development standards for code quality, workflow, and tooling.
+
+**Applies to:**
+- `**/*.{js,ts,py}` - All JavaScript, TypeScript, and Python files
+- `**/*.svelte` - Svelte components
+- `package.json` - Package configuration
+- `package-lock.json` - Lock file management
+- `requirements*.txt` - Python dependencies
+- `pyproject.toml` - Python project configuration
+- `*.config.{js,ts}` - Configuration files
+- `.eslintrc*` - ESLint configuration
+- `.prettierrc*` - Prettier configuration
+- `tsconfig.json` - TypeScript configuration
+- `vite.config.ts` - Build configuration
+- `svelte.config.js` - Svelte configuration
+- `vitest.config.ts` - Test configuration
+- `playwright.config.ts` - E2E test configuration
+- `.gitignore` - Git configuration
+- `README.md` - Documentation
+- `CONTRIBUTING.md` - Contribution guidelines
+
+## Code Quality
+- All JavaScript/TypeScript code must adhere to modern ESNext standards.
+- Use Prettier for code formatting (configure a .prettierrc file with sensible defaults like single quotes, trailing commas).
+- Use ESLint for code linting (configure a basic ESLint setup for the chosen framework).
+- All components should be modular and well-documented with JSDoc or TSDoc comments.
+
+## Version Control
+- Commit messages should follow conventional commit guidelines.
+- Before committing, ensure all linters and formatters pass, and all tests are green.
+
+## Accessibility
+- Prioritize semantic HTML and ARIA attributes for accessibility as per @docs Synapse_Hub_UI_Design (source 88).
+- All interactive elements must be keyboard accessible.
+- Maintain proper focus management and color contrast ratios.

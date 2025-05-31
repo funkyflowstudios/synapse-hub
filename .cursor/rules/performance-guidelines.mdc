@@ -1,0 +1,411 @@
+---
+description: 
+globs: src/workers/**/*.{ts,js}, src/components/**/*.svelte, src/lib/api/**/*.ts, src/lib/utils/**/*.ts, rpi-backend/app/services/**/*.py, rpi-backend/app/core/**/*.py, cursor-connector/**/*.py, **/*performance*.{py,ts,js,svelte}, **/*worker*.{ts,js}, **/*animation*.{ts,js,svelte}, **/*optimize*.{py,ts,js}, **/*cache*.{py,ts,js}, vite.config.ts, svelte.config.js, playwright.config.ts
+alwaysApply: false
+---
+# Performance Guidelines
+
+**Description:** Performance optimization standards for Synapse Hub multi-component system.
+
+**Applies to:**
+- `src/workers/**/*.{ts,js}` - Web Workers and background processing
+- `src/components/**/*.svelte` - Components with animations or performance concerns
+- `src/lib/api/**/*.ts` - API calls and data fetching
+- `src/lib/utils/**/*.ts` - Utility functions that may impact performance
+- `rpi-backend/app/services/**/*.py` - Backend services with RPi constraints
+- `rpi-backend/app/core/**/*.py` - Core backend functionality
+- `cursor-connector/**/*.py` - UI automation efficiency
+- `**/*performance*.{py,ts,js,svelte}` - Performance-related files
+- `**/*worker*.{ts,js}` - Worker files
+- `**/*animation*.{ts,js,svelte}` - Animation files
+- `**/*optimize*.{py,ts,js}` - Optimization files
+- `**/*cache*.{py,ts,js}` - Caching implementations
+- `vite.config.ts` - Build optimization
+- `svelte.config.js` - Svelte optimization
+- `playwright.config.ts` - Performance testing
+
+**Performance Targets:**
+- Sub-50ms Long Animation Frames (LoAF)
+- Sub-100ms interactive shell load time
+- 60fps animations
+- <200ms API response times (RPi constraint)
+
+---
+
+## Animation & Rendering (Frontend)
+
+### GPU-Accelerated Patterns (MANDATORY)
+```css
+/* Use transform and opacity for all animations */
+.animated-element {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+  will-change: transform, opacity; /* Trigger GPU layer */
+}
+
+.animated-element:hover {
+  transform: translateY(-2px); /* GPU-accelerated */
+}
+
+/* ❌ Avoid layout-triggering properties */
+/* top, left, width, height, margin, padding */
+
+/* ✅ Use transform equivalents */
+/* translateX/Y/Z, scale, rotate */
+```
+
+### Reduced Motion Support (MANDATORY)
+```css
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### WebGL Integration (Optional)
+```typescript
+// For liquid crystal controls and generative materials
+interface WebGLRenderer {
+  initializeContext(canvas: HTMLCanvasElement): WebGLRenderingContext;
+  renderLiquidCrystal(params: LiquidCrystalParams): void;
+  cleanupResources(): void;
+}
+```
+
+---
+
+## Background Processing (Frontend)
+
+### Web Workers (MANDATORY for Heavy Tasks)
+```typescript
+// Heavy data processing pattern
+const dataWorker = new Worker('/workers/data-processor.js');
+
+// Offload to worker
+dataWorker.postMessage({
+  type: 'PROCESS_TASK_DATA',
+  payload: largeDataSet
+});
+
+dataWorker.onmessage = (event) => {
+  const { type, result } = event.data;
+  if (type === 'PROCESSING_COMPLETE') {
+    updateUI(result);
+  }
+};
+```
+
+### API Call Optimization
+```typescript
+// Batch API calls where possible
+const batchAPICall = async (requests: APIRequest[]) => {
+  const response = await fetch('/api/batch', {
+    method: 'POST',
+    body: JSON.stringify({ requests })
+  });
+  return response.json();
+};
+
+// Debounced API calls
+import { debounce } from 'lodash-es';
+const debouncedAPICall = debounce(apiCall, 300);
+```
+
+---
+
+## Resource Loading (Frontend)
+
+### Critical Path Optimization
+```typescript
+// Preload critical assets only
+const preloadCriticalAssets = () => {
+  const criticalImages = ['/logo.svg', '/icons/main.svg'];
+  criticalImages.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
+};
+
+// Lazy load non-critical components
+const LazyTaskDetails = lazy(() => import('./TaskDetails.svelte'));
+const LazyChart = lazy(() => import('./Chart.svelte'));
+```
+
+### Bundle Optimization
+```typescript
+// Route-based code splitting
+const routes = {
+  '/': () => import('./routes/Home.svelte'),
+  '/tasks': () => import('./routes/Tasks.svelte'),
+  '/agents': () => import('./routes/Agents.svelte')
+};
+
+// Tree-shake unused exports
+export { TaskService } from './task-service'; // ✅ Named export
+// export * from './utils'; // ❌ Avoid wildcard exports
+```
+
+---
+
+## Backend Performance (Raspberry Pi 3B Optimized)
+
+### Memory Management (CRITICAL)
+```python
+import gc
+import psutil
+from functools import lru_cache
+
+class RPiOptimizedService:
+    def __init__(self):
+        self.memory_threshold = 0.8  # 80% memory usage limit
+    
+    @lru_cache(maxsize=128)
+    async def get_cached_data(self, key: str):
+        """Cache frequently accessed data with size limit"""
+        return await self.fetch_data(key)
+    
+    async def check_memory_usage(self):
+        """Monitor memory and trigger cleanup if needed"""
+        memory_percent = psutil.virtual_memory().percent / 100
+        if memory_percent > self.memory_threshold:
+            gc.collect()
+            self.get_cached_data.cache_clear()
+```
+
+### Database Optimization
+```python
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
+class OptimizedTaskService:
+    async def get_tasks_with_messages(self, limit: int = 10):
+        """Optimized query with proper loading strategy"""
+        stmt = (
+            select(Task)
+            .options(selectinload(Task.messages))  # Single additional query
+            .limit(limit)
+            .order_by(Task.created_at.desc())
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
+    
+    async def bulk_update_status(self, task_ids: List[str], status: TaskStatus):
+        """Batch database operations"""
+        stmt = (
+            update(Task)
+            .where(Task.task_id.in_(task_ids))
+            .values(status=status, updated_at=datetime.utcnow())
+        )
+        await self.db.execute(stmt)
+        await self.db.commit()
+```
+
+### Async Pattern Optimization
+```python
+import asyncio
+from typing import List
+
+async def process_tasks_concurrently(tasks: List[Task], max_concurrent: int = 3):
+    """Limit concurrent operations for RPi constraints"""
+    semaphore = asyncio.Semaphore(max_concurrent)
+    
+    async def process_single_task(task: Task):
+        async with semaphore:
+            return await ai_service.process_task(task)
+    
+    # Process tasks with controlled concurrency
+    results = await asyncio.gather(
+        *[process_single_task(task) for task in tasks],
+        return_exceptions=True
+    )
+    return results
+```
+
+---
+
+## Cursor Connector Performance
+
+### UI Automation Efficiency
+```python
+import time
+from functools import wraps
+
+def efficient_automation(max_retries: int = 3, delay: float = 0.1):
+    """Decorator for efficient UI automation with retries"""
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    await asyncio.sleep(delay * (2 ** attempt))  # Exponential backoff
+            return None
+        return wrapper
+    return decorator
+
+class MacOSCursorAutomation:
+    @efficient_automation(max_retries=3)
+    async def send_prompt(self, prompt: str) -> str:
+        """Optimized AppleScript execution"""
+        # Cache compiled AppleScript for reuse
+        if not hasattr(self, '_compiled_script'):
+            self._compiled_script = self.compile_applescript_template()
+        
+        return await self.execute_script(self._compiled_script, prompt)
+```
+
+### Process Management
+```python
+import psutil
+from typing import Optional
+
+class CursorProcessManager:
+    def __init__(self):
+        self.cursor_process: Optional[psutil.Process] = None
+    
+    async def find_cursor_process(self) -> Optional[psutil.Process]:
+        """Efficiently find Cursor process"""
+        if self.cursor_process and self.cursor_process.is_running():
+            return self.cursor_process
+        
+        for proc in psutil.process_iter(['pid', 'name']):
+            if proc.info['name'] and 'cursor' in proc.info['name'].lower():
+                self.cursor_process = proc
+                return proc
+        
+        return None
+    
+    async def is_cursor_responsive(self) -> bool:
+        """Check if Cursor is responsive without heavy operations"""
+        process = await self.find_cursor_process()
+        if not process:
+            return False
+        
+        # Check CPU usage as responsiveness indicator
+        cpu_percent = process.cpu_percent(interval=0.1)
+        return cpu_percent < 80  # Consider unresponsive if >80% CPU
+```
+
+---
+
+## Monitoring & Metrics
+
+### Performance Tracking
+```typescript
+// Frontend performance monitoring
+class PerformanceMonitor {
+  private metrics: Map<string, number[]> = new Map();
+  
+  startTimer(operation: string): () => void {
+    const start = performance.now();
+    return () => {
+      const duration = performance.now() - start;
+      this.recordMetric(operation, duration);
+      
+      // Warn if exceeding targets
+      if (duration > 50) {
+        console.warn(`Slow operation: ${operation} took ${duration}ms`);
+      }
+    };
+  }
+  
+  recordMetric(operation: string, duration: number) {
+    if (!this.metrics.has(operation)) {
+      this.metrics.set(operation, []);
+    }
+    this.metrics.get(operation)!.push(duration);
+  }
+  
+  getAverageTime(operation: string): number {
+    const times = this.metrics.get(operation) || [];
+    return times.reduce((a, b) => a + b, 0) / times.length;
+  }
+}
+
+// Usage in components
+const monitor = new PerformanceMonitor();
+
+async function handleTaskCreation(task: TaskCreate) {
+  const endTimer = monitor.startTimer('task_creation');
+  try {
+    await createTask(task);
+  } finally {
+    endTimer();
+  }
+}
+```
+
+### RPi Resource Monitoring
+```python
+import psutil
+import asyncio
+
+class RPiResourceMonitor:
+    async def get_system_stats(self):
+        """Get current system resource usage"""
+        return {
+            'cpu_percent': psutil.cpu_percent(interval=1),
+            'memory_percent': psutil.virtual_memory().percent,
+            'disk_usage': psutil.disk_usage('/').percent,
+            'temperature': self.get_cpu_temperature()
+        }
+    
+    def get_cpu_temperature(self) -> Optional[float]:
+        """Get RPi CPU temperature"""
+        try:
+            with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
+                temp = int(f.read()) / 1000.0
+                return temp
+        except:
+            return None
+    
+    async def check_throttling_risk(self) -> bool:
+        """Check if system is at risk of throttling"""
+        stats = await self.get_system_stats()
+        temp = stats.get('temperature')
+        
+        # RPi throttles at ~80°C
+        return (
+            stats['cpu_percent'] > 80 or
+            stats['memory_percent'] > 85 or
+            (temp and temp > 75)
+        )
+```
+
+---
+
+## Implementation Checklist
+
+### Frontend Performance
+- [ ] All animations use `transform` and `opacity`
+- [ ] `will-change` property set for animated elements
+- [ ] Web Workers implemented for heavy processing
+- [ ] Route-based code splitting configured
+- [ ] Critical resource preloading implemented
+- [ ] Bundle size optimized (<500KB initial)
+
+### Backend Performance (RPi)
+- [ ] Memory monitoring and cleanup implemented
+- [ ] Database queries optimized with proper loading
+- [ ] Async concurrency limits set (max 3 concurrent operations)
+- [ ] Response time monitoring (<200ms target)
+- [ ] Temperature monitoring for throttling prevention
+
+### Cursor Connector Performance
+- [ ] UI automation retry logic implemented
+- [ ] Process detection optimized
+- [ ] AppleScript compilation cached
+- [ ] Exponential backoff for failed operations
+- [ ] CPU usage monitoring for responsiveness
+
+This performance framework ensures optimal operation across all Synapse Hub components while respecting hardware constraints and maintaining smooth user experience.

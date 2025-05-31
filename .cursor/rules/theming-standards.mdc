@@ -1,0 +1,143 @@
+---
+description: 
+globs: src/app.css, src/lib/theme.ts, src/lib/palette.ts, src/lib/stores/theme.ts, src/styles/**/*.css, src/components/**/*.svelte, **/*theme*.{ts,js,css,svelte}, **/*style*.{css,svelte}, **/*palette*.{ts,js}, **/*color*.{ts,js,css}, **/*design*.{ts,js,css}, **/*.scss, tailwind.config.js, postcss.config.js
+alwaysApply: false
+---
+# Theming Standards
+
+**Description:** Standards for implementing themes and visual styles in Synapse Hub.
+
+**Applies to:**
+- `src/app.css` - Global theming system
+- `src/lib/theme.ts` - Theme service and management
+- `src/lib/palette.ts` - Palette management system
+- `src/lib/stores/theme.ts` - Theme state management
+- `src/styles/**/*.css` - Style files
+- `src/components/**/*.svelte` - When working on component styling
+- `**/*theme*.{ts,js,css,svelte}` - Theme-related files
+- `**/*style*.{css,svelte}` - Styling files
+- `**/*palette*.{ts,js}` - Palette files
+- `**/*color*.{ts,js,css}` - Color system files
+- `**/*design*.{ts,js,css}` - Design system files
+- `**/*.scss` - SCSS files
+- `tailwind.config.js` - Tailwind configuration (if used)
+- `postcss.config.js` - PostCSS configuration
+
+## Core Requirements
+
+### CSS Custom Properties Mandate
+- All themeable properties MUST use CSS Custom Properties (CSS variables)
+- Never hardcode colors, spacing, or typography values in component styles
+- Use the established naming convention: `--color-*`, `--spacing-*`, `--font-*`, etc.
+- Component-level dynamic theming should be possible using localized CSS Custom Properties
+
+### Accessibility Compliance
+- Ensure high contrast ratios are maintained for accessibility, especially when implementing personalized palettes
+- Maintain WCAG 2.2+ AAA compliance across all themes (Light, Dark, Twilight)
+- Support `prefers-reduced-motion` for all animations and transitions
+- Provide high contrast mode support via `@media (prefers-contrast: high)`
+- All interactive elements must have proper focus indicators using `--color-border-focus`
+
+### Theme Architecture
+- Support for Light, Dark, Twilight, and Auto themes
+- Automatic system preference detection via `@media (prefers-color-scheme: dark)`
+- Theme persistence via localStorage with the key `synapse-theme`
+- Smooth transitions between themes using `--transition-smooth`
+
+### Visual Philosophy: "Quiet Intelligence & Fluid Sophistication"
+- Implement "almost invisible" base styling - clean and unobtrusive
+- Use subtle depth cues with sophisticated shadow system (`--shadow-elevation-*`)
+- Apply gentle, sophisticated border radius (`--radius-*`)
+- Maintain fluid transitions with cubic-bezier easing
+- Implement liquid crystal control effects with backdrop-filter
+
+### Dynamic Theme Adjustments
+- Provide groundwork for dynamic theme adjustments like 'Twilight' mode and learned preferences
+- Implement placeholder CSS Custom Properties for future AI-driven personalization:
+  - `--contrast-multiplier` for learned contrast preferences
+  - `--brightness-adjustment` for ambient light adaptation
+  - `--text-scale-factor` for reading pattern optimization
+  - `--motion-intensity` for accessibility-based animation control
+  - `--focus-opacity` for productivity-based UI dimming
+
+### Hyper-Personalized Palettes
+- Support 3-4 color harmonious palettes that override interactive colors
+- Implement palette metadata for mood, time of day, and seasonal categorization
+- Provide seamless integration with the core theming system
+- Maintain accessibility standards when applying custom palettes
+
+## Implementation Guidelines
+
+### Color System
+```css
+/* Use semantic color names */
+--color-background-primary
+--color-surface-secondary
+--color-text-primary
+--color-border-focus
+--color-interactive-primary
+
+/* Never use direct hex values in components */
+/* ❌ Bad */
+background: #3b82f6;
+
+/* ✅ Good */
+background: var(--color-interactive-primary);
+```
+
+### Typography Scale
+```css
+/* Use responsive typography with scale factors */
+font-size: calc(var(--font-size-base) * var(--text-scale-factor));
+line-height: calc(var(--line-height-normal) * var(--line-height-factor));
+```
+
+### Transitions and Animations
+```css
+/* Use standardized transition timing */
+transition: all var(--transition-smooth);
+
+/* Respect motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  transition: none;
+}
+
+/* Apply dynamic duration multipliers */
+transition: all calc(var(--transition-smooth) * var(--animation-duration-multiplier));
+```
+
+### Component Theming
+```svelte
+<style>
+  .component {
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevation-low);
+    transition: all var(--transition-smooth);
+  }
+  
+  .component:hover {
+    background: var(--color-surface-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-elevation-medium);
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .component {
+      transition: none;
+    }
+    
+    .component:hover {
+      transform: none;
+    }
+  }
+</style>
+```
+
+## Testing Requirements
+- Test all themes (Light, Dark, Twilight, Auto) for proper contrast ratios
+- Verify smooth transitions between theme switches
+- Test with `prefers-reduced-motion: reduce`

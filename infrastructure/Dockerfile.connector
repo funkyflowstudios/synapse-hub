@@ -1,0 +1,39 @@
+FROM node:20-alpine
+
+# Install tools needed for GPIO and system access
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    python3 \
+    make \
+    g++ \
+    linux-headers
+
+# Set working directory
+WORKDIR /app
+
+# Create connector user
+RUN addgroup -g 1001 -S connector && \
+    adduser -S connector -u 1001
+
+# Copy connector package files
+COPY cursor-connector/package*.json ./
+RUN npm ci --include=dev
+
+# Copy connector source code
+COPY cursor-connector/ ./
+
+# Ensure proper permissions
+RUN chown -R connector:connector /app
+USER connector
+
+# Expose connector port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Start the connector service
+CMD ["npm", "run", "start"] 

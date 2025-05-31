@@ -1,0 +1,233 @@
+{
+  "cursor.general.codeContext": "enabled",
+  "cursor.general.autoCompletion": "enabled",
+  "cursor.general.enableTerminal": true,
+  "cursor.general.enableInlineChat": true,
+  "cursor.workspace.indexing": "enabled",
+  "cursor.workspace.codebaseAwareness": "full",
+  
+  "cursor.ai.model": "claude-4-sonnet",
+  "cursor.ai.temperature": 0.1,
+  "cursor.ai.maxTokens": 8192,
+  "cursor.ai.topP": 0.95,
+  "cursor.ai.extendedThinking": true,
+  "cursor.ai.extendedThinkingTokens": 64000,
+  "cursor.ai.parallelToolExecution": true,
+  "cursor.ai.memoryMode": "enhanced",
+  "cursor.ai.contextWindow": 200000,
+  "cursor.ai.autoContext": true,
+  "cursor.ai.smartFileIndexing": true,
+  "cursor.ai.semanticSearch": true,
+  "cursor.ai.codebaseAnalysis": true,
+  "cursor.ai.crossFileReference": true,
+  "cursor.ai.streamResponses": true,
+  "cursor.ai.prefetchSuggestions": true,
+  "cursor.ai.cacheResponses": true,
+  "cursor.ai.optimizedInference": true,
+  "cursor.ai.batchRequests": true,
+  "cursor.ai.smartThrottling": true,
+  "cursor.ai.inlineCompletion": true,
+  "cursor.ai.multiLineCompletion": true,
+  "cursor.ai.contextualSuggestions": true,
+  "cursor.ai.errorDetection": true,
+  "cursor.ai.refactoringAssistance": true,
+  "cursor.ai.testGeneration": true,
+  "cursor.ai.documentationGeneration": true,
+  "cursor.ai.codeExplanation": true,
+  "cursor.ai.diffView": true,
+  "cursor.ai.interactiveEditing": true,
+  "cursor.ai.realTimeCollaboration": true,
+  "cursor.ai.versionControl": true,
+  "cursor.ai.checkpointSystem": true,
+  "cursor.ai.undoRedoTracking": true,
+  "cursor.ai.privacyMode": true,
+  "cursor.ai.dataEncryption": true,
+  "cursor.ai.localProcessing": true,
+  "cursor.ai.sensitiveDataFiltering": true,
+  "cursor.ai.auditLogging": true,
+  "cursor.ui.responsiveLayout": true,
+  "cursor.ui.darkMode": true,
+  "cursor.ui.minimap": false,
+  "cursor.ui.breadcrumbs": true,
+  "cursor.ui.tabCompletion": true,
+  "cursor.ui.quickActions": true,
+  "cursor.ui.statusBarInfo": true,
+  "cursor.integrations.git": true,
+  "cursor.integrations.terminal": true,
+  "cursor.integrations.debugger": true,
+  "cursor.integrations.testing": true,
+  "cursor.integrations.deployment": true,
+  "cursor.integrations.cicd": true,
+  "cursor.workspace.autoSave": true,
+  "cursor.workspace.smartFolding": true,
+  "cursor.workspace.projectIndexing": true,
+  "cursor.workspace.symbolSearch": true,
+  "cursor.workspace.globalSearch": true,
+  "cursor.ai.agentic": true,
+  "cursor.ai.multiModal": true,
+  "cursor.ai.computerUse": false,
+  "cursor.ai.toolChaining": true,
+  "cursor.ai.reasoningMode": "extended",
+  "cursor.ai.learningMode": "adaptive",
+  "cursor.ai.personalizedSuggestions": true,
+  "cursor.experimental.betaFeatures": true,
+  "cursor.experimental.advancedReasoning": true,
+  "cursor.experimental.predictiveEditing": true,
+  "cursor.experimental.semanticUnderstanding": true,
+  "cursor.experimental.intentPrediction": true,
+  "cursor.monitoring.performanceTracking": true,
+  "cursor.monitoring.responseTime": true,
+  "cursor.monitoring.accuracyMetrics": true,
+  "cursor.monitoring.usageAnalytics": true,
+  "cursor.project.name": "Synapse-Hub",
+  "cursor.project.description": "AI-powered multi-agent collaboration platform with comprehensive development optimization",
+  "cursor.project.type": "full-stack",
+  "cursor.project.framework": "SvelteKit",
+  "cursor.project.backend": "Node.js",
+  "cursor.project.database": "SQLite with Drizzle ORM",
+  "cursor.project.containerization": "Docker",
+  "cursor.project.testing": "Vitest + Playwright",
+  
+  "cursor.context.includes": [
+    "src/**/*.{ts,js,svelte}",
+    "*.{md,json,yml,yaml}",
+    "scripts/**/*.ts",
+    "docs/**/*.md",
+    ".cursor/**/*",
+    "templates/**/*",
+    "messages/**/*"
+  ],
+  
+  "cursor.context.excludes": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".svelte-kit/**",
+    "coverage/**",
+    "test-results/**",
+    "*.log",
+    ".env*"
+  ],
+  
+  "cursor.context.priority": [
+    "AI_DEVELOPMENT_OPTIMIZATION_CHECKLIST.md",
+    "ARCHITECTURE_DECISIONS.md",
+    "CODE_PATTERNS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "SESSION_CONTEXT.md",
+    "src/lib/types/*.ts",
+    "src/lib/session/*.ts",
+    "src/lib/monitoring/*.ts"
+  ],
+  
+  "cursor.context.patterns": {
+    "architecture": "Always consider the three-panel adaptive layout system and component dependencies",
+    "state_management": "Use Svelte stores with proper TypeScript typing and reactive patterns",
+    "error_handling": "Implement comprehensive error tracking with correlation IDs",
+    "accessibility": "Maintain WCAG 2.2+ AAA compliance with semantic HTML and ARIA",
+    "performance": "Monitor Core Web Vitals and optimize for <50ms Long Animation Frames",
+    "testing": "Write comprehensive unit and integration tests with >80% coverage",
+    "documentation": "Document all decisions, implementations, and architectural changes"
+  },
+  
+  "cursor.ai.instructions": [
+    "Follow the AI Development Optimization Checklist phases systematically",
+    "Maintain session context and track implementation timeline",
+    "Record all major decisions with detailed reasoning",
+    "Break features into atomic, single-session units",
+    "Prioritize code quality, accessibility, and performance",
+    "Use existing code patterns and established architecture",
+    "Implement proper error handling and monitoring",
+    "Ensure all changes are properly tested and documented"
+  ],
+  
+  "cursor.ai.constraints": [
+    "Do not modify files outside the defined project scope",
+    "Always maintain backward compatibility unless explicitly approved",
+    "Follow the established three-panel layout conventions",
+    "Respect the monitoring and session management systems",
+    "Use TypeScript strictly with proper type definitions",
+    "Maintain correlation ID tracing across all components"
+  ],
+  
+  "cursor.shortcuts": {
+    "cursor.addSessionStep": "Ctrl+Shift+S",
+    "cursor.showNextSteps": "Ctrl+Shift+N",
+    "cursor.recordDecision": "Ctrl+Shift+D",
+    "cursor.updateTimeline": "Ctrl+Shift+T",
+    "cursor.showContext": "Ctrl+Shift+C",
+    "cursor.generateReport": "Ctrl+Shift+R"
+  },
+  
+  "cursor.integrations": {
+    "session_management": {
+      "enabled": true,
+      "auto_track": true,
+      "correlation_ids": true
+    },
+    "decision_logging": {
+      "enabled": true,
+      "auto_prompt": true,
+      "templates": true
+    },
+    "implementation_timeline": {
+      "enabled": true,
+      "auto_update": true,
+      "metrics": true
+    },
+    "next_steps": {
+      "enabled": true,
+      "recommendations": true,
+      "sequences": true
+    }
+  },
+  
+  "cursor.workspace.settings": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true
+    },
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "svelte.enable-ts-plugin": true,
+    "svelte.plugin.typescript.enable": true,
+    "eslint.validate": ["typescript", "svelte"],
+    "prettier.documentSelectors": ["**/*.svelte"]
+  },
+  
+  "cursor.ai.context_optimization": {
+    "session_startup_time": "under_2_seconds",
+    "relevant_context_priority": "high",
+    "memory_usage_limit": "512MB",
+    "context_refresh_interval": "30_seconds",
+    "auto_load_session": true,
+    "smart_context_filtering": true,
+    "phase_aware_suggestions": true
+  },
+  
+  "cursor.project.phases": {
+    "current": "Phase 6: Session Management & Context Optimization",
+    "completed": [
+      "Phase 0: Foundation Specifications (92%)",
+      "Phase 1: Context Preservation & Tracking (100%)",
+      "Phase 2: Code Generation Acceleration (100%)",
+      "Phase 3: Rapid Validation & Testing (100%)",
+      "Phase 4: Development Environment (100%)",
+      "Phase 5: Monitoring & Debugging (100%)"
+    ],
+    "next": "Phase 7: Advanced Automation & Future-Proofing"
+  },
+  
+  "cursor.commands": {
+    "session.start": "Initialize new development session",
+    "session.save": "Save current session state",
+    "session.restore": "Restore previous session",
+    "timeline.add": "Add implementation entry",
+    "decision.record": "Record new decision",
+    "steps.recommend": "Get next step recommendations",
+    "context.optimize": "Optimize context loading",
+    "report.generate": "Generate comprehensive report"
+  }
+} 
