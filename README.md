@@ -1,5 +1,15 @@
 # Synapse Hub
 
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/funkyflowstudios/synapse-hub/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-00a393.svg)](https://fastapi.tiangolo.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-1.0+-ff6600.svg)](https://kit.svelte.dev/)
+[![Tests](https://img.shields.io/badge/tests-142%2B%20passing-brightgreen.svg)](#testing)
+[![Health Check](https://img.shields.io/badge/health%20monitoring-✅%20active-brightgreen.svg)](#health-monitoring)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#cross-platform-support)
+[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-3B%2B%20ready-c51a4a.svg)](#raspberry-pi-deployment)
+
 An advanced AI-powered development environment with comprehensive automation and optimization systems, now supercharged with **Claude 4 Sonnet** - the world's best coding AI model.
 
 ## 🚀 Project Status

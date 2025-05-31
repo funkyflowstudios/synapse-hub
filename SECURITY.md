@@ -1,13 +1,25 @@
-# Security Policy
+# 🔒 Security Policy
 
 ## Supported Versions
 
-We release patches for security vulnerabilities. Which versions are eligible for receiving such patches depends on the CVSS v3.0 Rating:
+We actively maintain security for the following versions of Synapse Hub:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported | Status             | End of Life |
+| ------- | --------- | ------------------ | ----------- |
+| 0.1.x   | ✅        | Active Development | TBD         |
+| 0.0.x   | ⚠️        | Limited Support    | 2025-12-31  |
+
+### Version Support Policy
+
+- **Active Development**: Full security support, regular updates, and feature development
+- **Limited Support**: Critical security fixes only, no new features
+- **End of Life**: No security updates, users should upgrade immediately
+
+### Component-Specific Security
+
+**Backend (FastAPI)**: Production-ready with comprehensive health monitoring and error handling
+**Cursor Connector**: Cross-platform automation with sandboxed execution
+**Frontend (SvelteKit)**: Modern security practices with CSP and secure defaults
 
 ## Reporting a Vulnerability
 

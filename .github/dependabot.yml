@@ -1,0 +1,117 @@
+version: 2
+updates:
+  # Frontend npm dependencies
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    target-branch: 'develop'
+    reviewers:
+      - 'PSC2'
+    assignees:
+      - 'PSC2'
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps-dev'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'frontend'
+    ignore:
+      # Ignore major version updates for core frameworks
+      - dependency-name: 'svelte'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@sveltejs/kit'
+        update-types: ['version-update:semver-major']
+
+  # Backend Python dependencies
+  - package-ecosystem: 'pip'
+    directory: '/rpi-backend'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    target-branch: 'develop'
+    reviewers:
+      - 'PSC2'
+    assignees:
+      - 'PSC2'
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps-dev'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'backend'
+    ignore:
+      # Ignore major version updates for core frameworks
+      - dependency-name: 'fastapi'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'sqlalchemy'
+        update-types: ['version-update:semver-major']
+
+  # Cursor Connector Python dependencies
+  - package-ecosystem: 'pip'
+    directory: '/cursor-connector'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    target-branch: 'develop'
+    reviewers:
+      - 'PSC2'
+    assignees:
+      - 'PSC2'
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps-dev'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'cursor-connector'
+
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 3
+    target-branch: 'develop'
+    reviewers:
+      - 'PSC2'
+    assignees:
+      - 'PSC2'
+    commit-message:
+      prefix: 'ci'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+      - 'ci-cd'
+
+  # Docker
+  - package-ecosystem: 'docker'
+    directory: '/infrastructure'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 3
+    target-branch: 'develop'
+    reviewers:
+      - 'PSC2'
+    assignees:
+      - 'PSC2'
+    commit-message:
+      prefix: 'docker'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'docker'
