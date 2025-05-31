@@ -1,0 +1,49 @@
+# FastAPI Backend Requirements for Synapse-Hub
+# Core Framework
+fastapi==0.108.0
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy[asyncio]==2.0.25
+aiosqlite==0.19.0
+greenlet==3.2.2
+alembic==1.13.1
+
+# Async Support
+asyncio==3.4.3
+httpx==0.25.2
+websockets==12.0
+
+# AI Integration
+google-generativeai==0.3.2
+openai==1.6.1  # Backup AI provider
+anthropic==0.8.1  # Backup AI provider
+
+# Data Validation & Serialization
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Security & Authentication
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.6
+
+# Environment & Configuration
+python-dotenv==1.0.0
+click==8.1.7
+
+# Logging & Monitoring
+structlog==23.2.0
+prometheus-client==0.19.0
+
+# Development & Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.12.1
+isort==5.13.2
+mypy==1.8.0
+
+# Production
+gunicorn==21.2.0
+supervisor==4.2.5 
